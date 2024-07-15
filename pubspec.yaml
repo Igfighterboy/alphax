@@ -1,0 +1,55 @@
+name: myapp
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+  animations: ^2.0.11
+  hexcolor: ^3.0.1
+  get: ^4.6.5
+  flutter_svg: ^2.0.10+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+  # IMAGES
+    - assets/images/logo.png
+    - assets/images/google.svg
+
+    # FONTS
+    - assets/fonts/
+  fonts:
+    - family: broken
+      fonts:
+        - asset: assets/fonts/broken.ttf
+    - family: broken_filled
+      fonts:
+        - asset: assets/fonts/broken_filled.ttf
+    - family: LexendDeca
+      fonts:
+        - asset: assets/fonts/LexendDeca/LexendDeca-Black.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-Bold.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-ExtraBold.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-ExtraLight.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-Light.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-Medium.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-Regular.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-SemiBold.ttf
+        - asset: assets/fonts/LexendDeca/LexendDeca-Thin.ttf
