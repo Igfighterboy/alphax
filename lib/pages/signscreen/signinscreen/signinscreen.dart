@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:myapp/core/constatnts/colors.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/pages/mainscreen/mainscreen.dart';
 import 'package:myapp/pages/signscreen/signupscreen/signupscreen.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -207,15 +208,14 @@ class SignButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(40),
             ),
             child: TextButton(
-              onPressed: null,
-              // onPressed: () {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => ScreenAll(),
-              //     ),
-              //   );
-              // },
+              onPressed: () {
+                Get.to(() => MainScreen(),
+                    transition: Transition.cupertino,
+                    duration: Duration(
+                      seconds: 1,
+                    )
+                );
+              },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

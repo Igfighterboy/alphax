@@ -12,6 +12,13 @@ class AlphaTheme {
       secondary: darkmaincontainercolor,
       surface: darksubcontainercolor,
     ),
+    // APPBAR
+    appBarTheme: AppBarTheme(
+          backgroundColor: darkbarcolor, // Set the AppBar background color here
+          elevation: 0, // Set the AppBar elevation here
+    ),
+
+    // BOTTOMBAR
     navigationBarTheme: NavigationBarThemeData(
         backgroundColor: darkbackgroundcolor,
         indicatorColor: bothtabbackgroundcolor,
@@ -36,6 +43,13 @@ class AlphaTheme {
       secondary: lightmaincontainercolor,
       surface: lightsubcontainercolor,
     ),
+    // APPBAR
+    appBarTheme: AppBarTheme(
+          backgroundColor: lightbarcolor, 
+          elevation: 0, 
+    ),
+
+    // BOTTOMBAR
     navigationBarTheme: NavigationBarThemeData(
         backgroundColor: lightbackgroundcolor,
         indicatorColor: bothtabbackgroundcolor,

@@ -5,8 +5,19 @@ class TestingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.purple,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop();
+        return true; // Prevent default back button behavior
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Testing Page'),
+        ),
+        body: Center(
+          child: Text('Testing Page Content'),
+        ),
+      ),
     );
   }
 }
