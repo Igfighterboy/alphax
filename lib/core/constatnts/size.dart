@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 
 // HEIGHT
 
+const alphaheight10 = SizedBox(
+  height: 10,
+);
 const alphaheight20 = SizedBox(
   height: 20,
 );

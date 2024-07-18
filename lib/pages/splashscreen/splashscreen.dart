@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:myapp/pages/signscreen/signinscreen/signinscreen.dart';
+import 'package:myapp/core/constatnts/size.dart';
+import 'package:myapp/pages/onboardingscreen/onboardingscreen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,20 +16,24 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => SignInScreen()));
+        context,
+        MaterialPageRoute(
+          builder: (context) => const OnboardingScreen(),
+        ),
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Stack(
         children: [
-         const SafeArea(
+          SafeArea(
               child: Center(
-            child: MainArea(),
+            child: SplashMainArea(),
           ))
         ],
       ),
@@ -36,13 +41,40 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-class MainArea extends StatelessWidget {
-  const MainArea({
+class SplashMainArea extends StatefulWidget {
+  const SplashMainArea({
     super.key,
   });
 
   @override
+  State<SplashMainArea> createState() => _SplashMainAreaState();
+}
+
+class _SplashMainAreaState extends State<SplashMainArea>
+    with TickerProviderStateMixin {
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..addListener(() {
+        setState(() {});
+      });
+    controller.repeat(reverse: true);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -50,19 +82,10 @@ class MainArea extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            // border: Border.all(
-            //   color: secondarycolor, // Customize border color
-            //   width: 1.0, // Customize border width
-            // ),
-            boxShadow: [
-              BoxShadow(
-                // color:
-                //     secondarycolor.withOpacity(0.1), // Customize shadow color
-                spreadRadius: 2,
-                blurRadius: 4,
-                offset: Offset(0, 3), // Customize shadow offset
-              ),
-            ],
+            border: Border.all(
+              color: Theme.of(context).primaryColor,
+              width: 1.3,
+            ),
           ),
           child: ClipOval(
             child: Image.asset(
@@ -72,19 +95,22 @@ class MainArea extends StatelessWidget {
             ),
           ),
         ),
-        // sheight2,
-        // SplashScreen(),
-        // ClipRRect(
-        //   borderRadius: BorderRadius.circular(10),
-        //   child: const SizedBox(
-        //     width: 100,
-        //     height: 6,
-        //     child: LinearProgressIndicator(
-        //       // backgroundColor: textcolor,
-        //       // valueColor: AlwaysStoppedAnimation<Color>(primarycolor),
-        //     ),
-        //   ),
-        // ),
+        alphaheight20,
+        Container(
+          width: 140,
+          height: 6.5,
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(80),
+          ),
+          child: LinearProgressIndicator(
+            value: controller.value,
+            backgroundColor: Colors.transparent,
+            borderRadius: BorderRadius.circular(50),
+            valueColor: AlwaysStoppedAnimation<Color>(
+                colorScheme.primary), // Make the background transparent
+          ),
+        ),
         const Spacer(
           flex: 1,
         ),
@@ -92,19 +118,19 @@ class MainArea extends StatelessWidget {
           children: [
             Text(
               'From',
-              // style: GoogleFonts.poppins(
-              //   color: textcolor,
-              //   fontSize: 15,
-              //   fontWeight: FontWeight.w400,
-              // ),
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: 'LexendDeca'),
             ),
             Text(
               'ELiTE DEVS',
-              // style: GoogleFonts.firaSans(
-              //   color: textcolor,
-              //   fontSize: 20,
-              //   fontWeight: FontWeight.w600,
-              // ),
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'LexendDeca'),
             )
           ],
         ),

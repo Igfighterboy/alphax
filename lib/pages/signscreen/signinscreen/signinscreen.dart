@@ -97,95 +97,99 @@ class _SigninFormState extends State<SigninForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-        child: Column(
-      children: [
-        Center(
+    return Center(
+      child: Form(
           child: Column(
-            children: [
-              SizedBox(
-                width: 350,
-                height: 50,
-                child: TextFormField(
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 23,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'LexendDeca',
-                    ),
-                    suffixIcon: Icon(
-                      Broken.people,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                        borderRadius: BorderRadius.circular(40)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                        borderRadius: BorderRadius.circular(40)),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                  ),
-                ),
-              ),
-
-              alphaheight20,
-              // PASSWORD
-              SizedBox(
-                width: 350,
-                height: 50,
-                child: TextFormField(
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                  obscureText: _obscureText,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: TextStyle(
+        children: [
+          Center(
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 350,
+                  height: 50,
+                  child: TextFormField(
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      labelStyle: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontSize: 23,
-                        fontWeight: FontWeight.w400),
-                    suffixIcon: IconButton(
-                      icon: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
-                        },
-                        child: Icon(
-                          _obscureText ? Broken.eye_slash : Broken.eye,
-                          key: ValueKey<bool>(_obscureText),
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'LexendDeca',
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
+                      suffixIcon: Icon(
+                        Broken.message_text,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Theme.of(context).primaryColor),
+                          borderRadius: BorderRadius.circular(40)),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Theme.of(context).primaryColor),
+                          borderRadius: BorderRadius.circular(40)),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                        borderRadius: BorderRadius.circular(40)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                        borderRadius: BorderRadius.circular(40)),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
                   ),
                 ),
-              ),
-            ],
-          ),
-        )
-      ],
-    ));
+      
+                alphaheight20,
+                // PASSWORD
+                Center(
+                  child: SizedBox(
+                    width: 350,
+                    height: 50,
+                    child: TextFormField(
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                      obscureText: _obscureText,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 23,
+                            fontWeight: FontWeight.w400),
+                        suffixIcon: IconButton(
+                          icon: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder:
+                                (Widget child, Animation<double> animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            child: Icon(
+                              _obscureText ? Broken.eye_slash : Broken.eye,
+                              key: ValueKey<bool>(_obscureText),
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(40)),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(40)),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      )),
+    );
   }
 }
 
@@ -197,111 +201,113 @@ class SignButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Center(
-          child: Container(
-            height: 55,
-            width: 350,
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: TextButton(
-              onPressed: () {
-                Get.to(() => MainScreen(),
-                    transition: Transition.cupertino,
-                    duration: Duration(
-                      seconds: 1,
-                    )
-                );
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Sign In',
-                    style: TextStyle(
-                        color: buttontext,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'LexendDeca'),
-                  ),
-                  alphawidth10,
-                  Icon(
-                    Broken.login_1,
-                    color: buttontext,
-                    size: 25,
-                  ),
-                ],
+    return Center(
+      child: Column(
+        children: [
+          Center(
+            child: Container(
+              height: 55,
+              width: 350,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: TextButton(
+                onPressed: () {
+                  Get.to(() => MainScreen(),
+                      transition: Transition.cupertino,
+                      duration: Duration(
+                        seconds: 1,
+                      )
+                  );
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Sign In',
+                      style: TextStyle(
+                          color: buttontext,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'LexendDeca'),
+                    ),
+                    alphawidth10,
+                    Icon(
+                      Broken.login_1,
+                      color: buttontext,
+                      size: 25,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        alphaheight20,
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 100, // Set the desired width here
-              child: Divider(
-                color: dividercolor,
-                thickness: 1.0,
+          alphaheight20,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 100, // Set the desired width here
+                child: Divider(
+                  color: dividercolor,
+                  thickness: 1.0,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'OR',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Theme.of(context).primaryColor,
-                    fontFamily: 'LexendDeca'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'OR',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).primaryColor,
+                      fontFamily: 'LexendDeca'),
+                ),
               ),
-            ),
-            SizedBox(
-              width: 100,
-              child: Divider(
-                color: dividercolor,
-                thickness: 1.0,
+              SizedBox(
+                width: 100,
+                child: Divider(
+                  color: dividercolor,
+                  thickness: 1.0,
+                ),
               ),
-            ),
-          ],
-        ),
-        alphaheight20,
-        Center(
-          child: Container(
-            height: 55,
-            width: 350,
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: TextButton(
-              onPressed: null,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Continue With ',
-                    style: TextStyle(
-                        color: buttontext,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'LexendDeca'),
-                  ),
-                  SvgPicture.asset(
-                    'assets/images/google.svg',
-                    height: 30,
-                    color: buttontext,
-                  ),
-                ],
+            ],
+          ),
+          alphaheight20,
+          Center(
+            child: Container(
+              height: 55,
+              width: 350,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: TextButton(
+                onPressed: null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Continue With ',
+                      style: TextStyle(
+                          color: buttontext,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'LexendDeca'),
+                    ),
+                    SvgPicture.asset(
+                      'assets/images/google.svg',
+                      height: 30,
+                      color: buttontext,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -313,23 +319,25 @@ class AlreadySign extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        Get.to(
-          SignUpScreen(),
-          transition: Transition.cupertino,
-          duration: Duration(
-            seconds: 1,
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          Get.to(
+            SignUpScreen(),
+            transition: Transition.cupertino,
+            duration: Duration(
+              seconds: 1,
+            ),
+          );
+        },
+        child: Text(
+          "Don't Have A Account? Sign Up",
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: Theme.of(context).primaryColor,
+            fontFamily: 'LexendDeca',
           ),
-        );
-      },
-      child: Text(
-        "Don't Have A Account? Sign Up",
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w400,
-          color: Theme.of(context).primaryColor,
-          fontFamily: 'LexendDeca',
         ),
       ),
     );
