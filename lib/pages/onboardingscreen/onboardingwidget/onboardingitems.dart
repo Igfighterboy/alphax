@@ -22,7 +22,7 @@ class OnboardingItems {
     onSubTitleAlign: TextAlign.start,
     ),
     OnboardingInfo(
-      onTitle: "ailored Just For \nYou",
+      onTitle: "Tailored Just For \nYou",
       onSubtitle: "get playlists that match your mood",
       onDescriptions:
           "Discover personalized playlists curated to suit your taste. Your favorite music, always at your fingertips",

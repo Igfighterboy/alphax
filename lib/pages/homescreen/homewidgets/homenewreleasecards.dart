@@ -4,6 +4,7 @@ import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 import 'package:myapp/pages/homescreen/homewidgets/homesubpages/homesubnewrelease.dart';
 import 'package:myapp/services/spotify_services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeNewReleaseCard extends StatefulWidget {
   final bool showArrow;
@@ -45,7 +46,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
     });
 
     try {
-      final fetchedAlbums = await _spotifyService.fetchnewRelease();
+      final fetchedAlbums = await _spotifyService.fetchNewReleases();
       setState(() {
         _albumCache.albums = fetchedAlbums.map<Map<String, String>>((album) {
           final albumImages = album['images'] as List<dynamic>?;
@@ -60,6 +61,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
             'image': (albumImages != null && albumImages.isNotEmpty)
                 ? albumImages[0]['url'] as String
                 : 'https://via.placeholder.com/150',
+            'spotifyUri': album['uri'] ?? '', // Add the Spotify URI
           };
         }).toList();
         _albumCache.isFetched = true;
@@ -82,6 +84,19 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
     }
   }
 
+  void _launchSpotify(String albumId) async {
+    final url = 'spotify:album:$albumId';
+    try {
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        print('Could not launch $url');
+      }
+    } catch (e) {
+      print('Error launching Spotify URL: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -96,7 +111,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                 widget.homeIcon,
                 color: Theme.of(context).primaryColor,
               ),
-              alphawidth10,
+              SizedBox(width: 10),
               Text(
                 widget.homeTitle,
                 style: TextStyle(
@@ -106,7 +121,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                   fontFamily: 'LexendDeca',
                 ),
               ),
-              const Spacer(),
+              Spacer(),
               if (widget.showArrow)
                 GestureDetector(
                   onTap: () {
@@ -122,7 +137,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
           ),
         ),
         // SONG CARDS
-        alphaheight20,
+        SizedBox(height: 20),
         LimitedBox(
           maxHeight: 150,
           child: isLoading
@@ -132,58 +147,60 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                   itemCount: _albumCache.albums.length,
                   itemBuilder: (context, index) {
                     final album = _albumCache.albums[index];
-                    return Padding(
-                      padding:
-                          EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
-                      child: Container(
-                        width: 115,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Container(
-                              height: 105,
-                              width: 115,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  album['image']!,
-                                  fit: BoxFit.cover,
+                    return GestureDetector(
+                      onTap: () => _launchSpotify(album['spotifyUri']!),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
+                        child: Container(
+                          width: 115,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 105,
+                                width: 115,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    album['image']!,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(3),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _truncateText(album['title']!, 12),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Theme.of(context).primaryColor,
-                                      fontFamily: 'LexendDeca',
+                              Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _truncateText(album['title']!, 12),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Theme.of(context).primaryColor,
+                                        fontFamily: 'LexendDeca',
+                                      ),
+                                      textAlign: TextAlign.start,
                                     ),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                  Text(
-                                    _truncateText(album['artist']!, 10),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Theme.of(context).primaryColor,
-                                      fontFamily: 'LexendDeca',
+                                    Text(
+                                      _truncateText(album['artist']!, 10),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Theme.of(context).primaryColor,
+                                        fontFamily: 'LexendDeca',
+                                      ),
+                                      textAlign: TextAlign.start,
                                     ),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );

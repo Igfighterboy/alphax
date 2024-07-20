@@ -12,32 +12,62 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMixin {
-  final List<String> _cardTitles = [
-    'Card 1',
-    'Card 2',
-    'Card 3',
-    'Card 4',
-    'Card 5',
-    'Card 6',
+class _SearchScreenState extends State<SearchScreen>
+    with TickerProviderStateMixin {
+  final List<Widget> _cardTitles = [
+    SearchscreenCards(),
+    SearchscreenCards(),
+    SearchscreenCards(),
+    SearchscreenCards(),
+    SearchscreenCards(),
+    SearchscreenCards(),
   ];
 
-  late List<bool> _isVisible;
+  late List<AnimationController> _controllers;
+  late List<Animation<Offset>> _animations;
+
+  static const Duration _pageTransitionDuration =
+      Duration(milliseconds: 600); // Cupertino page transition duration
 
   @override
   void initState() {
     super.initState();
-    _isVisible = List.filled(_cardTitles.length, false);
+    _controllers = List.generate(
+      _cardTitles.length,
+      (index) => AnimationController(
+        duration: _pageTransitionDuration,
+        vsync: this,
+      ),
+    );
+    _animations = _controllers.map((controller) {
+      return Tween<Offset>(
+        begin: const Offset(1.0, 0.0), // Start position (off-screen to the right)
+        end: const Offset(0.0, 0.0), // End position (on-screen)
+      ).animate(
+        CurvedAnimation(
+          parent: controller,
+          curve: Curves.easeOut,
+        ),
+      );
+    }).toList();
+
     _animateItems();
   }
 
   void _animateItems() async {
-    for (int i = 0; i < _cardTitles.length; i++) {
-      await Future.delayed(Duration(milliseconds: 200));
-      setState(() {
-        _isVisible[i] = true;
-      });
+    for (int i = 0; i < _controllers.length; i++) {
+      await Future.delayed(_pageTransitionDuration ~/
+          _cardTitles.length); // Adjust delay to match page transition duration
+      _controllers[i].forward();
     }
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -52,28 +82,18 @@ class _SearchScreenState extends State<SearchScreen> with TickerProviderStateMix
                 padding: const EdgeInsets.all(8.0),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                    childAspectRatio: 2 / 1,
+                    crossAxisSpacing: 9,
+                    mainAxisSpacing: 9,
+                    childAspectRatio: 1.7 / 1,
                   ),
                   itemCount: _cardTitles.length,
                   itemBuilder: (context, index) {
-                    return AnimatedOpacity(
-                      opacity: _isVisible[index] ? 1.0 : 0.0,
-                      duration: Duration(milliseconds: 500),
-                      child: Card(
-                        elevation: 4,
-                        child: Center(
-                          child: Text(
-                            _cardTitles[index],
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    );
+                    return SlideTransition(
+                        position: _animations[index],
+                        child: _cardTitles[index]);
                   },
                 ),
               ),
@@ -100,10 +120,14 @@ class Searchbar extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              Get.to(SearchResultScreen(),
-                  transition: Transition.cupertino,
-                  curve: Curves.easeInOut,
-                  duration: Duration(milliseconds: 900));
+              Get.to(
+                const SearchResultScreen(),
+                transition: Transition.cupertino,
+                curve: Curves.easeInOut,
+                duration: const Duration(
+                  milliseconds: 900,
+                ),
+              );
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),

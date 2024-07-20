@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/pages/onboardingscreen/onboardingscreen.dart';

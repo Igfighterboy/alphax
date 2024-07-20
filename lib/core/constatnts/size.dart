@@ -14,6 +14,9 @@ const alphaheight30 = SizedBox(
 
 // WIDTH
 
+const alphawidth5 = SizedBox(
+  width: 5,
+);
 const alphawidth10 = SizedBox(
   width: 10,
 );

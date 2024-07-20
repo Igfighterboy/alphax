@@ -22,9 +22,12 @@ dependencies:
   carousel_slider: ^4.2.1 #USED
   smooth_page_indicator: ^1.1.0 #USED
   flutter_advanced_drawer: ^1.3.6 #USED
-  http: ^1.2.1
+  http: ^1.2.1 #USED
   shared_preferences: ^2.2.2 #USED
-
+  url_launcher: ^6.3.0
+  provider: ^6.1.2
+  youtube_explode_dart: ^2.2.1 #USED
+  just_audio: ^0.9.37 #USED
 dev_dependencies:
   flutter_test:
     sdk: flutter

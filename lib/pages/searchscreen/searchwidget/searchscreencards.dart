@@ -1,39 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/core/constatnts/size.dart';
+import 'package:myapp/core/icon_fonts/broken_icons.dart';
 
 class SearchscreenCards extends StatelessWidget {
   const SearchscreenCards({super.key});
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double alphasWidth = screenWidth * 0.40;
-    final double alphasheight = 110;
     final colorScheme = Theme.of(context).colorScheme;
-    final Color alphacardcolor = colorScheme.surface;
-    return Padding(
-      padding: const EdgeInsets.only(left: 7, right: 7),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: alphasWidth,
-            height: alphasheight,
-            decoration: BoxDecoration(
-              color: alphacardcolor,
-              borderRadius: BorderRadius.circular(13),
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 45,
+              height: 45,
+              decoration: BoxDecoration(
+                color: colorScheme.secondary,
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: Icon(
+                Broken.music,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
-          ),
-          alphawidth10,
-          Container(
-            width: alphasWidth,
-            height: alphasheight,
-            decoration: BoxDecoration(
-              color: alphacardcolor,
-              borderRadius: BorderRadius.circular(13),
-            ),
-          ),
-        ],
+            alphaheight10,
+            SizedBox(
+              width: double.infinity,
+                child: Text(
+              'Malayalam',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'LexendDeca',
+                color: Theme.of(context).primaryColor,
+              ),
+              textAlign: TextAlign.end,
+            ))
+          ],
+        ),
       ),
     );
   }
