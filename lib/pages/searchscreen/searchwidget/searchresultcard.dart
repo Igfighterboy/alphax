@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/services/youtube_services.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
-import 'package:myapp/pages/miniplayerscreen/miniplayer.dart';
-
+import 'package:myapp/controller/playercontroller/playerstate.dart';
+import 'package:provider/provider.dart';
+import 'package:palette_generator/palette_generator.dart';
 class SearchResultCard extends StatelessWidget {
   final Video video;
 
@@ -17,16 +19,34 @@ class SearchResultCard extends StatelessWidget {
     }
   }
 
+  Future<Color> _getDominantColor(String imageUrl) async {
+    final PaletteGenerator paletteGenerator = await PaletteGenerator.fromImageProvider(
+      NetworkImage(imageUrl),
+    );
+    return paletteGenerator.dominantColor?.color ?? Colors.grey[900]!;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
+    final youtubeService = YoutubeService();
     return GestureDetector(
-      onTap: () {
-        // showModalBottomSheet(
-        //   context: context,
-        //   builder: (context) => MiniPlayer(video: video),
-        // );
+      onTap: () async {
+        try {
+          final dominantColor = await _getDominantColor(video.thumbnails.standardResUrl);
+          final audioStreamInfo = await youtubeService.getAudioStream(video.id.value);
+          final audioUrl = audioStreamInfo.url.toString();
+          final playerState = Provider.of<PlayerState>(context, listen: false);
+          playerState.play(
+            video.title,
+            video.author,
+            video.thumbnails.standardResUrl,
+            dominantColor,
+            audioUrl,
+          );
+        } catch (e) {
+          print('Error accessing PlayerState: $e');
+        }
       },
       child: Container(
         width: double.infinity,
@@ -46,7 +66,6 @@ class SearchResultCard extends StatelessWidget {
                     width: 55,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: Colors.red,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: ClipRRect(

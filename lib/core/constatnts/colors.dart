@@ -20,6 +20,6 @@ final darkbarcolor = HexColor('#000000');
 
 // BOTH MODE
 final bothtabbackgroundcolor = HexColor('#292f6b');
-final iconscolor = HexColor('#bababa');
+final iconscolor = HexColor('#ffffff');
 final buttontext = HexColor('#ffffff');
 final dividercolor = HexColor('#D3D3D3');

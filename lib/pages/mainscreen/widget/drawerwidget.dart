@@ -45,7 +45,7 @@ class DrawerWidget extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Theme.of(context).primaryColor,
+                              color: iconscolor,
                               width: 2,
                             ),
                           ),

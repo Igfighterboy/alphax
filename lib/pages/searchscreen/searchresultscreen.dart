@@ -82,7 +82,9 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           separatorBuilder: (context, index) => alphaheight10,
           itemBuilder: (context, index) {
             final video = _searchResults[index];
-            return SearchResultCard(video: video);
+            return SearchResultCard(
+              video: video,
+            );
           },
         ),
       ),
