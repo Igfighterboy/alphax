@@ -29,6 +29,7 @@ dependencies:
   youtube_explode_dart: ^2.2.1 #USED
   just_audio: ^0.9.37 #USED
   palette_generator: ^0.3.3+4
+  flutter_local_notifications: ^14.0.0 #USED
 dev_dependencies:
   flutter_test:
     sdk: flutter

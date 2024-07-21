@@ -11,7 +11,6 @@ import 'package:myapp/pages/profilescreen/profilescreen.dart';
 import 'package:myapp/pages/searchscreen/searchscreen.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:provider/provider.dart';
-
 import '../../controller/playercontroller/playerstate.dart';
 
 class MainScreen extends StatefulWidget {
@@ -58,7 +57,6 @@ class _MainScreenState extends State<MainScreen> {
           (route) => false,
         );
       } else if (_currentRoute == '/home') {
-       
         _navigatorKey.currentState!.popUntil((route) => route.isFirst);
       }
     });
@@ -215,18 +213,19 @@ class _MainScreenState extends State<MainScreen> {
               ),
               Consumer<PlayerState>(
                 builder: (context, playerState, child) {
-                  if (playerState.isPlaying) {
-                    return _isFullScreenPlayerVisible
-                        ? FullScreenPlayer(onCollapse: _hideFullScreenPlayer)
-                        : Align(
-                            alignment: Alignment.bottomCenter,
-                            child: MiniPlayer(onExpand: _showFullScreenPlayer),
-                          );
-                  } else {
-                    return const SizedBox.shrink(); 
-                  }
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: playerState.isMiniPlayerVisible || _isFullScreenPlayerVisible
+                        ? _isFullScreenPlayerVisible
+                            ? FullScreenPlayer(onCollapse: _hideFullScreenPlayer)
+                            : Align(
+                                alignment: Alignment.bottomCenter,
+                                child: MiniPlayer(onExpand: _showFullScreenPlayer),
+                              )
+                        : const SizedBox.shrink(),
+                  );
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -295,6 +294,3 @@ class _MainScreenState extends State<MainScreen> {
     advanceddrawerController.showDrawer();
   }
 }
-
-
-

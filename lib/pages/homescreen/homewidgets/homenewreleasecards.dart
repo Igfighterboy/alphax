@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/services/youtube_services.dart';
+import 'package:myapp/controller/playercontroller/playerstate.dart';
+import 'package:provider/provider.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:myapp/pages/homescreen/homewidgets/homesubpages/homesubnewrelease.dart';
-import 'package:myapp/services/spotify_services.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeNewReleaseCard extends StatefulWidget {
   final bool showArrow;
@@ -23,7 +25,7 @@ class HomeNewReleaseCard extends StatefulWidget {
 }
 
 class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
-  final SpotifyService _spotifyService = SpotifyService();
+  final YoutubeService _youtubeService = YoutubeService();
   final AlbumCache _albumCache = AlbumCache();
   bool isLoading = true;
   bool hasFetched = false;
@@ -32,7 +34,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
   void initState() {
     super.initState();
     if (!_albumCache.isFetched) {
-      fetchnewRelease();
+      fetchNewRelease();
     } else {
       setState(() {
         isLoading = false;
@@ -40,30 +42,16 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
     }
   }
 
-  Future<void> fetchnewRelease() async {
+  Future<void> fetchNewRelease() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      final fetchedAlbums = await _spotifyService.fetchNewReleases();
+      final fetchedAlbums =
+          await _youtubeService.fetchNewReleases('Malayalam new songs');
       setState(() {
-        _albumCache.albums = fetchedAlbums.map<Map<String, String>>((album) {
-          final albumImages = album['images'] as List<dynamic>?;
-          final artistNames = (album['artists'] as List<dynamic>?)
-              ?.map((artist) => artist['name'] as String?)
-              .where((name) => name != null)
-              .join(', ');
-
-          return {
-            'title': album['name'] ?? 'Unknown Title',
-            'artist': artistNames ?? 'Unknown Artist',
-            'image': (albumImages != null && albumImages.isNotEmpty)
-                ? albumImages[0]['url'] as String
-                : 'https://via.placeholder.com/150',
-            'spotifyUri': album['uri'] ?? '', // Add the Spotify URI
-          };
-        }).toList();
+        _albumCache.albums = fetchedAlbums;
         _albumCache.isFetched = true;
         isLoading = false;
         hasFetched = true;
@@ -84,18 +72,22 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
     }
   }
 
-  void _launchSpotify(String albumId) async {
-    final url = 'spotify:album:$albumId';
-    try {
-      if (await canLaunch(url)) {
-        await launch(url);
-      } else {
-        print('Could not launch $url');
-      }
-    } catch (e) {
-      print('Error launching Spotify URL: $e');
-    }
+  void _playSong(BuildContext context, Map<String, String> album) async {
+  final playerState = Provider.of<PlayerState>(context, listen: false);
+  final youtubeExplode = YoutubeExplode();
+  try {
+    var video = await youtubeExplode.videos.get(album['videoUrl']!);
+    var manifest = await youtubeExplode.videos.streamsClient.getManifest(video.id);
+    var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
+    var audioUrl = audioStreamInfo.url.toString();
+
+    playerState.play(album['title']!, album['artist']!, album['image']!, Colors.white, audioUrl);
+  } catch (e) {
+    print('Error playing song: $e');
+  } finally {
+    youtubeExplode.close();
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -148,9 +140,10 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                   itemBuilder: (context, index) {
                     final album = _albumCache.albums[index];
                     return GestureDetector(
-                      onTap: () => _launchSpotify(album['spotifyUri']!),
+                      onTap: () => _playSong(context, album),
                       child: Padding(
-                        padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
+                        padding: EdgeInsets.only(
+                            left: index == 0 ? 15 : 0, right: 15),
                         child: Container(
                           width: 115,
                           decoration: BoxDecoration(

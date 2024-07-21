@@ -30,6 +30,19 @@ class YoutubeService {
     return audioStreamInfo;
   }
 
+  Future<List<Map<String, String>>> fetchNewReleases(String query) async {
+    final searchResults = await _youtubeExplode.search.search(query);
+    return searchResults.map((result) {
+      final video = result as Video;
+      return {
+        'title': video.title,
+        'artist': video.author,
+        'image': video.thumbnails.standardResUrl,
+        'videoUrl': video.url,
+      };
+    }).toList();
+  }
+
   void dispose() {
     _youtubeExplode.close();
   }
