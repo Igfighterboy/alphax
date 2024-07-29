@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:myapp/controller/playercontroller/playerstate.dart';
+import 'package:myapp/controller/recentcontroller/played_song_services.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/pages/onboardingscreen/onboardingscreen.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
+    _initializeApp();
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
@@ -23,6 +26,13 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     });
+  }
+
+  Future<void> _initializeApp() async {
+    final playedSongsService = PlayedSongsService();
+    final playedSongs = await playedSongsService.loadPlayedSongs();
+    final playerState = Provider.of<PlayerState>(context, listen: false);
+    playerState.updatePlayedSongs(playedSongs);
   }
 
   @override

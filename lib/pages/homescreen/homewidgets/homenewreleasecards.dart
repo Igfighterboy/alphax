@@ -7,6 +7,7 @@ import 'package:myapp/controller/playercontroller/playerstate.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:myapp/pages/homescreen/homewidgets/homesubpages/homesubnewrelease.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeNewReleaseCard extends StatefulWidget {
   final bool showArrow;
@@ -43,24 +44,30 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
   }
 
   Future<void> fetchNewRelease() async {
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
     });
 
     try {
       final fetchedAlbums =
-          await _youtubeService.fetchNewReleases('Malayalam new songs');
-      setState(() {
-        _albumCache.albums = fetchedAlbums;
-        _albumCache.isFetched = true;
-        isLoading = false;
-        hasFetched = true;
-      });
+          await _youtubeService.fetchNewReleases('Malayalam New Release Music');
+      if (mounted) {
+        setState(() {
+          _albumCache.albums = fetchedAlbums;
+          _albumCache.isFetched = true;
+          isLoading = false;
+          hasFetched = true;
+        });
+      }
     } catch (e) {
       print(e);
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -73,21 +80,23 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
   }
 
   void _playSong(BuildContext context, Map<String, String> album) async {
-  final playerState = Provider.of<PlayerState>(context, listen: false);
-  final youtubeExplode = YoutubeExplode();
-  try {
-    var video = await youtubeExplode.videos.get(album['videoUrl']!);
-    var manifest = await youtubeExplode.videos.streamsClient.getManifest(video.id);
-    var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
-    var audioUrl = audioStreamInfo.url.toString();
+    final playerState = Provider.of<PlayerState>(context, listen: false);
+    final youtubeExplode = YoutubeExplode();
+    try {
+      var video = await youtubeExplode.videos.get(album['videoUrl']!);
+      var manifest =
+          await youtubeExplode.videos.streamsClient.getManifest(video.id);
+      var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
+      var audioUrl = audioStreamInfo.url.toString();
 
-    playerState.play(album['title']!, album['artist']!, album['image']!, Colors.white, audioUrl);
-  } catch (e) {
-    print('Error playing song: $e');
-  } finally {
-    youtubeExplode.close();
+      playerState.play(
+          album['title']!, album['artist']!, album['image']!, audioUrl);
+    } catch (e) {
+      print('Error playing song: $e');
+    } finally {
+      youtubeExplode.close();
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +112,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                 widget.homeIcon,
                 color: Theme.of(context).primaryColor,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 widget.homeTitle,
                 style: TextStyle(
@@ -133,7 +142,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
         LimitedBox(
           maxHeight: 150,
           child: isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? _buildShimmerList()
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _albumCache.albums.length,
@@ -201,6 +210,61 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                 ),
         ),
       ],
+    );
+  }
+
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: 5, // Number of shimmer items
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: 115,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 105,
+                    width: 115,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 15,
+                          width: 60,
+                          color: Colors.grey[300],
+                        ),
+                        SizedBox(height: 5),
+                        Container(
+                          height: 12,
+                          width: 40,
+                          color: Colors.grey[300],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

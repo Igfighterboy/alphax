@@ -38,14 +38,14 @@ final ThemeData darkTheme = ThemeData(
   scaffoldBackgroundColor: darkbackgroundcolor,
   primaryColor: darktextcolor,
   colorScheme: ColorScheme.light().copyWith(
-    primary: darkactivecolor,
+    primary: lightactivecolor,
     secondary: darkmaincontainercolor,
     surface: darksubcontainercolor,
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
-    backgroundColor: darkbarcolor, // Set the AppBar background color here
-    elevation: 0, // Set the AppBar elevation here
+    backgroundColor: darkbarcolor, 
+    elevation: 0, 
   ),
 
   // BOTTOMBAR

@@ -5,7 +5,7 @@ import 'package:myapp/core/constatnts/colors.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 import 'package:myapp/core/themes/alphathemenotifier.dart';
-import 'package:myapp/testingpage.dart';
+import 'package:myapp/pages/settingsscreen/settingsscreen.dart';
 import 'package:provider/provider.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -95,9 +95,9 @@ class DrawerWidget extends StatelessWidget {
             sideIcon: Broken.information,
             sideButtonTap: () {
               advanceddrawerController.hideDrawer();
-              navigatorKey.currentState!.push(
-                CupertinoPageRoute(builder: (context) => PostButton()),
-              );
+              // navigatorKey.currentState!.push(
+              //   CupertinoPageRoute(builder: (context) => PostButton()),
+              // );
             },
           ),
           alphaheight10,
@@ -106,19 +106,22 @@ class DrawerWidget extends StatelessWidget {
             sideIcon: Broken.clock,
             sideButtonTap: () {
               advanceddrawerController.hideDrawer();
-              navigatorKey.currentState!.push(
-                CupertinoPageRoute(builder: (context) => PostButton()),
-              );
+              // navigatorKey.currentState!.push(
+              //   CupertinoPageRoute(builder: (context) => PostButton()),
+              // );
             },
           ),
           alphaheight10,
           DrawerCardWidget(
-            sideTitle: "What's New",
+            sideTitle: "Settings",
             sideIcon: Broken.setting_2,
             sideButtonTap: () {
               advanceddrawerController.hideDrawer();
               navigatorKey.currentState!.push(
-                CupertinoPageRoute(builder: (context) => PostButton()),
+                CupertinoPageRoute(
+                  builder: (context) =>
+                      SettingsScreen(navigatorKey: navigatorKey),
+                ),
               );
             },
           ),
@@ -136,7 +139,12 @@ class DrawerWidget extends StatelessWidget {
                 sideButtonTap: () {},
               ),
               alphaheight10,
-              const ThemeTabs(),
+              const ThemeTabs(
+                themeWidth: 61,
+                themeHeight: 35,
+                themecontainerWidth: 210,
+                themeLeft: 70.0
+              ),
             ],
           ),
         ),
@@ -202,14 +210,24 @@ class DrawerCardWidget extends StatelessWidget {
 }
 
 class ThemeTabs extends StatelessWidget {
-  const ThemeTabs({super.key});
+  final double themeWidth;
+  final double themecontainerWidth;
+  final double themeHeight;
+  final double themeLeft;
+  const ThemeTabs({
+    super.key,
+    required this.themeWidth,
+    required this.themecontainerWidth,
+    required this.themeHeight,
+    required this.themeLeft,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    final double _alphathemewidth = 61;
-    final double _alphathemeheight = 35;
+    final double _alphathemewidth = themeWidth;
+    final double _alphathemeheight = themeHeight;
     final BorderRadius _alphathemeradius = BorderRadius.circular(10);
     int selectedIndex;
     switch (themeNotifier.themeMode) {
@@ -228,7 +246,7 @@ class ThemeTabs extends StatelessWidget {
     }
 
     return Container(
-      width: 210,
+      width: themecontainerWidth,
       height: 50,
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -241,7 +259,7 @@ class ThemeTabs extends StatelessWidget {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              left: selectedIndex * 70.0,
+              left: selectedIndex * themeLeft,
               top: 7,
               child: Container(
                 height: _alphathemeheight,

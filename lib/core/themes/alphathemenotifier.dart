@@ -29,13 +29,13 @@ class ThemeNotifier extends ChangeNotifier {
 
   void switchTheme(ThemeModeType mode) {
     _themeMode = mode;
+    _saveThemeMode(); // Save the theme mode whenever it is changed
     notifyListeners();
   }
 
   void _saveThemeMode() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int themeIndex = prefs.getInt('thememode') ?? 0;
-    _themeMode = ThemeModeType.values[themeIndex];
+    await prefs.setInt('thememode', _themeMode.index); // Save the index of the theme mode
   }
 
   void _loadThemeMode() async {

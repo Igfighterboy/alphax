@@ -25,11 +25,14 @@ dependencies:
   http: ^1.2.1 #USED
   shared_preferences: ^2.2.2 #USED
   url_launcher: ^6.3.0
-  provider: ^6.1.2
+  provider: ^6.1.2 #USED
   youtube_explode_dart: ^2.2.1 #USED
   just_audio: ^0.9.37 #USED
   palette_generator: ^0.3.3+4
-  flutter_local_notifications: ^14.0.0 #USED
+  flutter_local_notifications: ^14.0.0 #CURRENTLY NOT USING
+  audio_service: ^0.18.15 #USED
+  shimmer: ^3.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

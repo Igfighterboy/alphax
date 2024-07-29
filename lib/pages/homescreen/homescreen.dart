@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/controller/recentcontroller/played_song_services.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 import 'package:myapp/pages/homescreen/homewidgets/homeartistwidget.dart';
@@ -17,9 +18,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final PlayedSongsService _playedSongsService = PlayedSongsService();
+  List<Map<String, String>> _recentlyPlayedSongs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentlyPlayedSongs();
+  }
+
+  Future<void> _loadRecentlyPlayedSongs() async {
+    final songs = await _playedSongsService.loadPlayedSongs();
+    setState(() {
+      _recentlyPlayedSongs = songs;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -29,27 +47,16 @@ class _HomeScreenState extends State<HomeScreen> {
             alphaheight20,
             const HomeCarouselWidget(),
             alphaheight20,
-            const HomeRecentlyListenedCard(
-              homeIcon: Broken.command_square,
-              homeTitle: 'Recent Listened',
-              showArrow: false,
-            ),
+            if (_recentlyPlayedSongs.isNotEmpty)
+              const HomeRecentlyListenedCard(
+                homeIcon: Broken.command_square,
+                homeTitle: 'Recent Listened',
+                showArrow: false,
+              ),
             alphaheight30,
             const HomeNewReleaseCard(
               homeIcon: Broken.crown_1,
               homeTitle: 'New Releases',
-              showArrow: true,
-            ),
-            alphaheight30,
-            const HomeArtistCardWidget(
-              homeIcon: Broken.star_1,
-              homeTitle: 'Favourite Artist',
-              showArrow: false,
-            ),
-            alphaheight30,
-            const HomeBestArtistWidget(
-              homeIcon: Broken.category_2,
-              homeTitle: 'Best Of Artist',
               showArrow: true,
             ),
             alphaheight30,
@@ -58,6 +65,18 @@ class _HomeScreenState extends State<HomeScreen> {
               homeTitle: 'Popular albums',
               showArrow: true,
             ),
+            const HomeBestArtistWidget(
+              homeIcon: Broken.category_2,
+              homeTitle: 'Best Of Artist',
+              showArrow: true,
+            ),
+            const HomeArtistCardWidget(
+              homeIcon: Broken.star_1,
+              homeTitle: 'Favourite Artist',
+              showArrow: false,
+            ),
+            alphaheight30,
+            alphaheight30,
           ],
         ),
       ),

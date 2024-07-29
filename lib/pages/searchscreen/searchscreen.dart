@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 import 'package:myapp/pages/searchscreen/searchresultscreen.dart';
@@ -41,8 +41,8 @@ class _SearchScreenState extends State<SearchScreen>
     );
     _animations = _controllers.map((controller) {
       return Tween<Offset>(
-        begin: const Offset(1.0, 0.0), // Start position (off-screen to the right)
-        end: const Offset(0.0, 0.0), // End position (on-screen)
+        begin: const Offset(1.0, 0.0),
+        end: const Offset(0.0, 0.0), 
       ).animate(
         CurvedAnimation(
           parent: controller,
@@ -120,14 +120,8 @@ class Searchbar extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              Get.to(
-                const SearchResultScreen(),
-                transition: Transition.cupertino,
-                curve: Curves.easeInOut,
-                duration: const Duration(
-                  milliseconds: 900,
-                ),
-              );
+              Navigator.of(context).push(CupertinoPageRoute(
+                        builder: (context) => SearchResultScreen()));
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
@@ -161,3 +155,4 @@ class Searchbar extends StatelessWidget {
     );
   }
 }
+

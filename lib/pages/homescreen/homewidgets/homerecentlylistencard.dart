@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/controller/recentcontroller/played_song_services.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
-
+import 'package:shimmer/shimmer.dart';
 
 class HomeRecentlyListenedCard extends StatefulWidget {
   final bool showArrow;
@@ -16,10 +17,36 @@ class HomeRecentlyListenedCard extends StatefulWidget {
   });
 
   @override
-  State<HomeRecentlyListenedCard> createState() => _HomeRecentlyListenedCardState();
+  State<HomeRecentlyListenedCard> createState() =>
+      _HomeRecentlyListenedCardState();
 }
 
 class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
+  final PlayedSongsService _playedSongsService = PlayedSongsService();
+  List<Map<String, String>> _recentlyPlayedSongs = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentlyPlayedSongs();
+  }
+
+  Future<void> _loadRecentlyPlayedSongs() async {
+    final songs = await _playedSongsService.loadPlayedSongs();
+    setState(() {
+      _recentlyPlayedSongs = songs;
+      _isLoading = false;
+    });
+  }
+
+  String _truncateText(String text, int limit) {
+    if (text.length <= limit) {
+      return text;
+    } else {
+      return '${text.substring(0, limit)}..';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,74 +86,140 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
             ],
           ),
         ),
-
-        // SONG CARDS
         alphaheight20,
-       LimitedBox(
-                    maxHeight: 150,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        ;
-                        return Padding(
-                          padding: EdgeInsets.only(
-                              left: index == 0 ? 15 : 0, right: 15),
-                          child: Container(
-                            width: 115,
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      'https://i.scdn.co/image/ab67616d0000b2735c7f0831de3b5ca077095127',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(3),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Marimazha',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontFamily: 'LexendDeca'),
-                                        textAlign: TextAlign.start,
-                                      ),
-                                      Text(
-                                        'Vidhyasagar',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontFamily: 'LexendDeca'),
-                                        textAlign: TextAlign.start,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+        _isLoading
+            ? _buildShimmerPlaceholder()
+            : LimitedBox(
+                maxHeight: 150,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _recentlyPlayedSongs.length,
+                  itemBuilder: (context, index) {
+                    final song = _recentlyPlayedSongs[index];
+                    return Padding(
+                      padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          // Implement play functionality here
+                          // playerState.play(song['title']!, song['artist']!, song['thumbnailUrl']!, song['audioUrl']!);
+                        },
+                        child: Container(
+                          width: 115,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 105,
+                                width: 115,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    song['thumbnailUrl']!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _truncateText(song['title']!, 12),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Theme.of(context).primaryColor,
+                                        fontFamily: 'LexendDeca',
+                                      ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                    Text(
+                                      _truncateText(song['artist']!, 10),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Theme.of(context).primaryColor,
+                                        fontFamily: 'LexendDeca',
+                                      ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
       ],
     );
   }
-}
 
+  Widget _buildShimmerPlaceholder() {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return LimitedBox(
+      maxHeight: 150,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
+            child: Shimmer.fromColors(
+              baseColor: colorScheme.secondary,
+              highlightColor: colorScheme.surface,
+              child: Container(
+                width: 115,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 105,
+                      width: 115,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(3),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 12,
+                            width: 70,
+                            color: Colors.grey[300],
+                          ),
+                          alphaheight10,
+                          Container(
+                            height: 12,
+                            width: 50,
+                            color: Colors.grey[300],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

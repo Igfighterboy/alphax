@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:myapp/core/constatnts/colors.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/pages/accountscreation/accountcreation.dart';
 import 'package:myapp/pages/mainscreen/mainscreen.dart';
 import 'package:myapp/pages/signscreen/signupscreen/signupscreen.dart';
 
@@ -30,7 +31,7 @@ class SignInScreen extends StatelessWidget {
                   size: 30,
                   color: Theme.of(context).primaryColor,
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -323,7 +324,8 @@ class AlreadySign extends StatelessWidget {
       child: TextButton(
         onPressed: () {
           Get.to(
-            SignUpScreen(),
+            AccountCreation(),
+            // SignUpScreen(),
             transition: Transition.cupertino,
             duration: Duration(
               seconds: 1,

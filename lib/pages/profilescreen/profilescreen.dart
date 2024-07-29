@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/pages/profilescreen/profilewidgets/profilebadges.dart';
+import 'package:myapp/pages/profilescreen/profilewidgets/profilestats.dart';
 import 'package:myapp/pages/profilescreen/profilewidgets/profileuserwidget.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -16,7 +17,9 @@ class ProfileScreen extends StatelessWidget {
           children: [
             ProfileUserProfile(colorScheme: colorScheme),
             alphaheight20,
-            ProfileBadges()
+            ProfileBadges(),
+            alphaheight20,
+            ProfileStatsWidget(),
           ],
         ),
       ),

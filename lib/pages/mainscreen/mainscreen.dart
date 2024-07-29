@@ -19,6 +19,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  DateTime? lastPressed;
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   int _selectedIndex = 0;
@@ -89,11 +90,29 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<bool> _onWillPop() async {
+    if (_isFullScreenPlayerVisible) {
+      _hideFullScreenPlayer();
+      return Future.value(false);
+    }
+
     if (_navigatorKey.currentState!.canPop()) {
       _navigatorKey.currentState!.pop();
-      return false;
+      return Future.value(false);
     }
-    return true;
+
+    final now = DateTime.now();
+    final maxDuration = Duration(seconds: 2);
+    final isWarning =
+        lastPressed == null || now.difference(lastPressed!) > maxDuration;
+
+    if (isWarning) {
+      lastPressed = DateTime.now();
+      final snackBar = SnackBar(content: Text('Press once more to exit'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
   }
 
   final advanceddrawerController = AdvancedDrawerController();
@@ -101,12 +120,16 @@ class _MainScreenState extends State<MainScreen> {
   void _showFullScreenPlayer() {
     setState(() {
       _isFullScreenPlayerVisible = true;
+      _showAppBar = false;
+      _showBottomNavBar = false;
     });
   }
 
   void _hideFullScreenPlayer() {
     setState(() {
       _isFullScreenPlayerVisible = false;
+      _showAppBar = true;
+      _showBottomNavBar = true;
     });
   }
 
@@ -129,62 +152,62 @@ class _MainScreenState extends State<MainScreen> {
         navigatorKey: _navigatorKey,
         advanceddrawerController: advanceddrawerController,
       ),
-      child: Scaffold(
-        appBar: _showAppBar
-            ? PreferredSize(
-                preferredSize: const Size.fromHeight(50.0),
-                child: AppBar(
-                  automaticallyImplyLeading: false,
-                  flexibleSpace: Center(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 15, left: 15, right: 20),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            onPressed: () {
-                              drawerControl();
-                            },
-                            child: Icon(
-                              Broken.menu,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          Spacer(),
-                          Container(
-                            width: 35,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: Scaffold(
+          appBar: _showAppBar
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(50.0),
+                  child: AppBar(
+                    automaticallyImplyLeading: false,
+                    flexibleSpace: Center(
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.only(top: 15, left: 15, right: 20),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                              ),
+                              onPressed: () {
+                                drawerControl();
+                              },
+                              child: Icon(
+                                Broken.menu,
                                 color: Theme.of(context).primaryColor,
-                                width: 2,
                               ),
                             ),
-                            child: ClipOval(
-                              child: Image.network(
-                                'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                                width: 35,
-                                height: 35,
-                                fit: BoxFit.cover,
+                            Spacer(),
+                            Container(
+                              width: 35,
+                              height: 35,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 2,
+                                ),
+                              ),
+                              child: ClipOval(
+                                child: Image.network(
+                                  'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                                  width: 35,
+                                  height: 35,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              )
-            : null,
-        body: WillPopScope(
-          onWillPop: _onWillPop,
-          child: Stack(
+                )
+              : null,
+          body: Stack(
             children: [
               Navigator(
                 key: _navigatorKey,
@@ -215,77 +238,80 @@ class _MainScreenState extends State<MainScreen> {
                 builder: (context, playerState, child) {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    child: playerState.isMiniPlayerVisible || _isFullScreenPlayerVisible
+                    child: playerState.isMiniPlayerVisible ||
+                            _isFullScreenPlayerVisible
                         ? _isFullScreenPlayerVisible
-                            ? FullScreenPlayer(onCollapse: _hideFullScreenPlayer)
-                            : Align(
+                            ? FullScreenPlayer(
+                                onCollapse: _hideFullScreenPlayer)
+                              : Align(
                                 alignment: Alignment.bottomCenter,
-                                child: MiniPlayer(onExpand: _showFullScreenPlayer),
+                                child:
+                                    MiniPlayer(onExpand: _showFullScreenPlayer),
                               )
-                        : const SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                   );
                 },
               ),
             ],
           ),
+          bottomNavigationBar: _showBottomNavBar
+              ? NavigationBar(
+                  animationDuration: const Duration(seconds: 1),
+                  height: 64.0,
+                  elevation: 22,
+                  labelBehavior:
+                      NavigationDestinationLabelBehavior.onlyShowSelected,
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: _onItemTapped,
+                  destinations: [
+                    NavigationDestination(
+                      icon: Icon(
+                        Broken.home_1,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      label: 'Home',
+                      selectedIcon: Icon(
+                        Broken.home_1,
+                        color: iconscolor,
+                      ),
+                    ),
+                    NavigationDestination(
+                      icon: Icon(
+                        Broken.search_normal,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      label: 'Search',
+                      selectedIcon: Icon(
+                        Broken.search_normal,
+                        color: iconscolor,
+                      ),
+                    ),
+                    NavigationDestination(
+                      icon: Icon(
+                        Broken.music_library_2,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      label: 'Library',
+                      selectedIcon: Icon(
+                        Broken.music_library_2,
+                        color: iconscolor,
+                      ),
+                    ),
+                    NavigationDestination(
+                      icon: Icon(
+                        Broken.profile_2user,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      label: 'Profile',
+                      selectedIcon: Icon(
+                        Broken.profile_2user,
+                        color: iconscolor,
+                      ),
+                    ),
+                  ],
+                )
+              : null,
         ),
-        bottomNavigationBar: _showBottomNavBar
-            ? NavigationBar(
-                animationDuration: const Duration(seconds: 1),
-                height: 64.0,
-                elevation: 22,
-                labelBehavior:
-                    NavigationDestinationLabelBehavior.onlyShowSelected,
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: _onItemTapped,
-                destinations: [
-                  NavigationDestination(
-                    icon: Icon(
-                      Broken.home_1,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    label: 'Home',
-                    selectedIcon: Icon(
-                      Broken.home_1,
-                      color: iconscolor,
-                    ),
-                  ),
-                  NavigationDestination(
-                    icon: Icon(
-                      Broken.search_normal,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    label: 'Search',
-                    selectedIcon: Icon(
-                      Broken.search_normal,
-                      color: iconscolor,
-                    ),
-                  ),
-                  NavigationDestination(
-                    icon: Icon(
-                      Broken.music_library_2,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    label: 'Library',
-                    selectedIcon: Icon(
-                      Broken.music_library_2,
-                      color: iconscolor,
-                    ),
-                  ),
-                  NavigationDestination(
-                    icon: Icon(
-                      Broken.profile_2user,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    label: 'Profile',
-                    selectedIcon: Icon(
-                      Broken.profile_2user,
-                      color: iconscolor,
-                    ),
-                  ),
-                ],
-              )
-            : null,
       ),
     );
   }
@@ -294,3 +320,4 @@ class _MainScreenState extends State<MainScreen> {
     advanceddrawerController.showDrawer();
   }
 }
+

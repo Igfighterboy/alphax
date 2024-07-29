@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:myapp/core/constatnts/colors.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/pages/mainscreen/mainscreen.dart';
 import 'package:myapp/pages/signscreen/signinscreen/signinscreen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final usernameController = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final _formKey = GlobalKey<FormState>();
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
@@ -36,7 +42,7 @@ class SignUpScreen extends StatelessWidget {
         ),
       ),
       extendBodyBehindAppBar: true,
-      body: const Stack(
+      body: Stack(
         children: [
           // SignBackground(),
           Center(
@@ -44,13 +50,23 @@ class SignUpScreen extends StatelessWidget {
               child: Column(
                 children: [
                   alphaheight20,
-                  SigninTitle(),
+                  const SigninTitle(),
                   alphaheight20,
-                  SigninForm(),
+                  SigninForm(
+                    formKey: _formKey,
+                    usernameController: usernameController,
+                    emailController: emailController,
+                    passwordController: passwordController,
+                  ),
                   alphaheight20,
-                  SignButton(),
+                  SignButton(
+                    formKey: _formKey,
+                    usernameController: usernameController,
+                    emailController: emailController,
+                    passwordController: passwordController,
+                  ),
                   alphaheight20,
-                  AlreadySign(),
+                  const AlreadySign(),
                 ],
               ),
             ),
@@ -83,143 +99,142 @@ class SigninTitle extends StatelessWidget {
   }
 }
 
-class SigninForm extends StatefulWidget {
+class SigninForm extends StatelessWidget {
   const SigninForm({
     super.key,
+    required this.formKey,
+    required this.usernameController,
+    required this.emailController,
+    required this.passwordController,
   });
 
-  @override
-  State<SigninForm> createState() => _SigninFormState();
-}
-
-class _SigninFormState extends State<SigninForm> {
-  bool _obscureText = true;
+  final GlobalKey<FormState> formKey;
+  final TextEditingController usernameController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Form(
-          child: Column(
-        children: [
-          Center(
-            child: Column(
-              children: [
-                SizedBox(
-                  width: 350,
-                  height: 50,
-                  child: TextFormField(
-                    style: TextStyle(color: Theme.of(context).primaryColor),
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      labelStyle: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 23,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'LexendDeca',
-                      ),
-                      suffixIcon: Icon(
-                        Broken.people,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
-                          borderRadius: BorderRadius.circular(40)),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
-                          borderRadius: BorderRadius.circular(40)),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                    ),
+        key: formKey,
+        child: Column(
+          children: [
+            SizedBox(
+              width: 350,
+              height: 50,
+              child: TextFormField(
+                controller: usernameController,
+                style: TextStyle(color: Theme.of(context).primaryColor),
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'LexendDeca',
                   ),
-                ),
-
-                alphaheight20,
-                SizedBox(
-                  width: 350,
-                  height: 50,
-                  child: TextFormField(
-                    style: TextStyle(color: Theme.of(context).primaryColor),
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 23,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'LexendDeca',
-                      ),
-                      suffixIcon: Icon(
-                        Broken.message_text,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
-                          borderRadius: BorderRadius.circular(40)),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
-                          borderRadius: BorderRadius.circular(40)),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                    ),
+                  suffixIcon: Icon(
+                    Broken.people,
+                    color: Theme.of(context).primaryColor,
                   ),
-                ),
-
-                alphaheight20,
-                // PASSWORD
-                Center(
-                  child: SizedBox(
-                    width: 350,
-                    height: 50,
-                    child: TextFormField(
-                      style: TextStyle(color: Theme.of(context).primaryColor),
-                      obscureText: _obscureText,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 23,
-                            fontWeight: FontWeight.w400),
-                        suffixIcon: IconButton(
-                          icon: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
-                            child: Icon(
-                              _obscureText ? Broken.eye_slash : Broken.eye,
-                              key: ValueKey<bool>(_obscureText),
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            borderRadius: BorderRadius.circular(40)),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            borderRadius: BorderRadius.circular(40)),
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                      ),
-                    ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderRadius: BorderRadius.circular(40),
                   ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                 ),
-              ],
+              ),
             ),
-          )
-        ],
-      )),
+            alphaheight20,
+            SizedBox(
+              width: 350,
+              height: 50,
+              child: TextFormField(
+                controller: emailController,
+                style: TextStyle(color: Theme.of(context).primaryColor),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'LexendDeca',
+                  ),
+                  suffixIcon: Icon(
+                    Broken.message_text,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                ),
+              ),
+            ),
+            alphaheight20,
+            SizedBox(
+              width: 350,
+              height: 50,
+              child: TextFormField(
+                controller: passwordController,
+                style: TextStyle(color: Theme.of(context).primaryColor),
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                      child: Icon(
+                        true ? Broken.eye_slash : Broken.eye,
+                        key: const ValueKey<bool>(true),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    onPressed: () {},
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -227,7 +242,51 @@ class _SigninFormState extends State<SigninForm> {
 class SignButton extends StatelessWidget {
   const SignButton({
     super.key,
+    required this.formKey,
+    required this.usernameController,
+    required this.emailController,
+    required this.passwordController,
   });
+
+  final GlobalKey<FormState> formKey;
+  final TextEditingController usernameController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
+  Future<void> _signup(BuildContext context) async {
+    if (!formKey.currentState!.validate()) {
+      Get.snackbar('Error', 'Please fill in all fields',
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+      return;
+    }
+
+    final username = usernameController.text;
+    final email = emailController.text;
+    final password = passwordController.text;
+    final token = 'tokenController.text';
+    const String url = 'http://172.232.0.1:3000/auth/signup'; // Your API URL
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+      },
+      body: json.encode({
+        'username': username,
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      Get.snackbar('Success', 'Sign-up successful',
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
+    } else {
+      Get.snackbar('Error', 'Sign-up failed',
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,17 +303,18 @@ class SignButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(40),
               ),
               child: TextButton(
-                onPressed: () {},
+                onPressed: () => _signup(context),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'Sign Up',
                       style: TextStyle(
-                          color: buttontext,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'LexendDeca'),
+                        color: buttontext,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'LexendDeca',
+                      ),
                     ),
                     alphawidth10,
                     Icon(
@@ -272,7 +332,7 @@ class SignButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: 100, // Set the desired width here
+                width: 100,
                 child: Divider(
                   color: dividercolor,
                   thickness: 1.0,
@@ -283,10 +343,11 @@ class SignButton extends StatelessWidget {
                 child: Text(
                   'OR',
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: Theme.of(context).primaryColor,
-                      fontFamily: 'LexendDeca'),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: Theme.of(context).primaryColor,
+                    fontFamily: 'LexendDeca',
+                  ),
                 ),
               ),
               SizedBox(
@@ -315,10 +376,11 @@ class SignButton extends StatelessWidget {
                     Text(
                       'Continue With ',
                       style: TextStyle(
-                          color: buttontext,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'LexendDeca'),
+                        color: buttontext,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'LexendDeca',
+                      ),
                     ),
                     SvgPicture.asset(
                       'assets/images/google.svg',
@@ -347,11 +409,9 @@ class AlreadySign extends StatelessWidget {
       child: TextButton(
         onPressed: () {
           Get.to(
-            SignInScreen(),
+            const SignInScreen(),
             transition: Transition.cupertino,
-            duration: Duration(
-              seconds: 1,
-            ),
+            duration: const Duration(seconds: 1),
           );
         },
         child: Text(
@@ -367,352 +427,3 @@ class AlreadySign extends StatelessWidget {
     );
   }
 }
-
-//     return Scaffold(
-//       appBar: PreferredSize(
-//         preferredSize: const Size.fromHeight(50),
-//         child: AppBar(
-//           backgroundColor: Colors.transparent,
-//           elevation: 0,
-//           automaticallyImplyLeading: false,
-//           title: Row(
-//             mainAxisAlignment: MainAxisAlignment.start,
-//             children: [
-//               TextButton(
-//                 onPressed: null,
-//                 child: Icon(
-//                   Broken.arrow_left_2,
-//                   size: 30,
-//                   color: Theme.of(context).primaryColor,
-//                 ),
-//               )
-//             ],
-//           ),
-//         ),
-//       ),
-//       extendBodyBehindAppBar: true,
-//       body: Center(
-//         child: Stack(
-//           children: [
-//             // const SignBackground(),
-//             Center(
-//               child: ListView(
-//                 children: const [
-//                   SignUpTitle(),
-//                   alphaheight20,
-//                   SignUpForm(),
-//                   alphaheight20,
-//                   SignUpButton(),
-//                   SizedBox(
-//                     height: 15,
-//                   ),
-//                   AlreadyhSign(),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class SignUpTitle extends StatelessWidget {
-//   const SignUpTitle({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.only(left: 16.0),
-//       child: Text(
-//         'Sign Up',
-//         style: TextStyle(
-//           fontSize: 30,
-//           fontWeight: FontWeight.w700,
-//           color: Theme.of(context).primaryColor,
-//           fontFamily: 'LexendDeca',
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class SignUpForm extends StatefulWidget {
-//   const SignUpForm({
-//     super.key,
-//   });
-
-//   @override
-//   State<SignUpForm> createState() => _SigninFormState();
-// }
-
-// class _SigninFormState extends State<SignUpForm> {
-//   bool _obscureText = true;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Form(
-//         child: Column(
-//       children: [
-//         Center(
-//           child: Column(
-//             children: [
-//               SizedBox(
-//                 width: 350,
-//                 height: 50,
-//                 child: TextFormField(
-//                   style: TextStyle(color: Theme.of(context).primaryColor),
-//                   decoration: InputDecoration(
-//                     labelText: 'Username',
-//                     labelStyle: TextStyle(
-//                       color: Theme.of(context).primaryColor,
-//                       fontSize: 23,
-//                       fontWeight: FontWeight.w400,
-//                       fontFamily: 'LexendDeca',
-//                     ),
-//                     suffixIcon: Icon(
-//                       Broken.people,
-//                       color: Theme.of(context).primaryColor,
-//                     ),
-//                     focusedBorder: OutlineInputBorder(
-//                         borderSide:
-//                             BorderSide(color: Theme.of(context).primaryColor),
-//                         borderRadius: BorderRadius.circular(40)),
-//                     enabledBorder: OutlineInputBorder(
-//                         borderSide:
-//                             BorderSide(color: Theme.of(context).primaryColor),
-//                         borderRadius: BorderRadius.circular(40)),
-//                     floatingLabelBehavior: FloatingLabelBehavior.always,
-//                   ),
-//                 ),
-//               ),
-
-//               alphaheight20,
-//               SizedBox(
-//                 width: 350,
-//                 height: 50,
-//                 child: TextFormField(
-//                   style: TextStyle(color: Theme.of(context).primaryColor),
-//                   decoration: InputDecoration(
-//                     labelText: 'Email',
-//                     labelStyle: TextStyle(
-//                       color: Theme.of(context).primaryColor,
-//                       fontSize: 23,
-//                       fontWeight: FontWeight.w400,
-//                       fontFamily: 'LexendDeca',
-//                     ),
-//                     suffixIcon: Icon(
-//                       Broken.message_text,
-//                       color: Theme.of(context).primaryColor,
-//                     ),
-//                     focusedBorder: OutlineInputBorder(
-//                         borderSide:
-//                             BorderSide(color: Theme.of(context).primaryColor),
-//                         borderRadius: BorderRadius.circular(40)),
-//                     enabledBorder: OutlineInputBorder(
-//                         borderSide:
-//                             BorderSide(color: Theme.of(context).primaryColor),
-//                         borderRadius: BorderRadius.circular(40)),
-//                     floatingLabelBehavior: FloatingLabelBehavior.always,
-//                   ),
-//                 ),
-//               ),
-
-//               alphaheight20,
-//               // PASSWORD
-//               SizedBox(
-//                 width: 350,
-//                 height: 50,
-//                 child: TextFormField(
-//                   style: TextStyle(color: Theme.of(context).primaryColor),
-//                   obscureText: _obscureText,
-//                   decoration: InputDecoration(
-//                     labelText: 'Password',
-//                     labelStyle: TextStyle(
-//                         color: Theme.of(context).primaryColor,
-//                         fontSize: 23,
-//                         fontWeight: FontWeight.w400),
-//                     suffixIcon: IconButton(
-//                       icon: AnimatedSwitcher(
-//                         duration: const Duration(milliseconds: 300),
-//                         transitionBuilder:
-//                             (Widget child, Animation<double> animation) {
-//                           return FadeTransition(
-//                             opacity: animation,
-//                             child: child,
-//                           );
-//                         },
-//                         child: Icon(
-//                           _obscureText ? Broken.eye_slash : Broken.eye,
-//                           key: ValueKey<bool>(_obscureText),
-//                           color: Theme.of(context).primaryColor,
-//                         ),
-//                       ),
-//                       onPressed: () {
-//                         setState(() {
-//                           _obscureText = !_obscureText;
-//                         });
-//                       },
-//                     ),
-//                     focusedBorder: OutlineInputBorder(
-//                         borderSide:
-//                             BorderSide(color: Theme.of(context).primaryColor),
-//                         borderRadius: BorderRadius.circular(40)),
-//                     enabledBorder: OutlineInputBorder(
-//                         borderSide:
-//                             BorderSide(color: Theme.of(context).primaryColor),
-//                         borderRadius: BorderRadius.circular(40)),
-//                     floatingLabelBehavior: FloatingLabelBehavior.always,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         )
-//       ],
-//     ));
-//   }
-// }
-
-// class SignUpButton extends StatelessWidget {
-//   const SignUpButton({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final colorScheme = Theme.of(context).colorScheme;
-//     return Column(
-//       children: [
-//         Center(
-//           child: Container(
-//             height: 55,
-//             width: 350,
-//             decoration: BoxDecoration(
-//               color: colorScheme.primary,
-//               borderRadius: BorderRadius.circular(40),
-//             ),
-//             child: TextButton(
-//               onPressed: null,
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Text(
-//                     'Create Account',
-//                     style: TextStyle(
-//                         color: buttontext,
-//                         fontSize: 18,
-//                         fontWeight: FontWeight.w400,
-//                         fontFamily: 'LexendDeca'),
-//                   ),
-//                   alphawidth10,
-//                   Icon(
-//                     Broken.login,
-//                     color: buttontext,
-//                     size: 25,
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//         alphaheight20,
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//              SizedBox(
-//               width: 100,
-//               child: Divider(
-//                 color: dividercolor,
-//                 thickness: 1.0,
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//               child: Text(
-//                 'OR',
-//                 style: TextStyle(
-//                     fontSize: 18,
-//                     fontWeight: FontWeight.w400,
-//                     color: Theme.of(context).primaryColor,
-//                     fontFamily: 'LexendDeca'),
-//               ),
-//             ),
-//             SizedBox(
-//               width: 100,
-//               child: Divider(
-//                 color: dividercolor,
-//                 thickness: 1.0,
-//               ),
-//             ),
-//           ],
-//         ),
-//         alphaheight20,
-//         Center(
-//           child: Container(
-//             height: 55,
-//             width: 350,
-//             decoration: BoxDecoration(
-//               color: colorScheme.primary,
-//               borderRadius: BorderRadius.circular(40),
-              
-//             ),
-//             child: TextButton(
-//               onPressed: null,
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Text(
-//                     'Continue With ',
-//                     style: TextStyle(
-//                         color: buttontext,
-//                         fontSize: 18,
-//                         fontWeight: FontWeight.w400,
-//                         fontFamily: 'LexendDeca'),
-//                   ),
-//                   SvgPicture.asset(
-//                     'assets/images/google.svg',
-//                     height: 30,
-//                     color: buttontext,
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
-// class AlreadyhSign extends StatelessWidget {
-//   const AlreadyhSign({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextButton(
-//       onPressed: () {
-//         Get.to(
-//           const SignInScreen(),
-//           transition: Transition.cupertino,
-//           duration: const Duration(
-//             seconds: 1,
-//           ),
-//         );
-//       },
-//       child: Text(
-//         "Already Have A Account? Sign In",
-//         style: TextStyle(
-//           fontSize: 15,
-//           fontWeight: FontWeight.w400,
-//           color: Theme.of(context).primaryColor,
-//           fontFamily: 'LexendDeca',
-//         ),
-//       ),
-//     );
-//   }
-// }
