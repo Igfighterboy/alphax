@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/services/youtube_services.dart';
+import 'package:myapp/services/audio_cache_service.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
@@ -18,24 +19,31 @@ class SearchResultCard extends StatefulWidget {
 
 class _SearchResultCardState extends State<SearchResultCard> {
   bool _isLoading = true;
+  late final AudioCacheService _audioCacheService;
 
   @override
   void initState() {
     super.initState();
-    // Simulate a loading delay
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    _audioCacheService = AudioCacheService(); 
+    _precacheAudioUrl();
+  }
+
+  Future<void> _precacheAudioUrl() async {
+    try {
+      await _audioCacheService.prefetchAudioStreams([widget.video]);
+    } catch (e) {
+      print('Error during audio prefetching: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   String _truncateText(String text, int limit) {
-    if (text.length <= limit) {
-      return text;
-    } else {
-      return '${text.substring(0, limit)}..';
-    }
+    return text.length <= limit ? text : '${text.substring(0, limit)}..';
   }
 
   @override
@@ -43,15 +51,22 @@ class _SearchResultCardState extends State<SearchResultCard> {
     final screenWidth = MediaQuery.of(context).size.width;
     final containerWidth = screenWidth * 0.9;
     final colorScheme = Theme.of(context).colorScheme;
-    final youtubeService = YoutubeService();
 
     return GestureDetector(
       onTap: () async {
+        final playerState = Provider.of<PlayerState>(context, listen: false);
         try {
-          final audioStreamInfo = await youtubeService.getAudioStream(widget.video.id.value);
-          final audioUrl = audioStreamInfo.url.toString();
-          final playerState = Provider.of<PlayerState>(context, listen: false);
-          playerState.play(
+          setState(() {
+            _isLoading = true;
+          });
+          String? audioUrl = await _audioCacheService.getCachedAudioUrl(widget.video.id.value);
+          if (audioUrl == null) {
+            final youtubeService = YoutubeService();
+            final audioStreamInfo = await youtubeService.getAudioStream(widget.video.id.value);
+            audioUrl = audioStreamInfo.url.toString();
+            await _audioCacheService.cacheAudioStream(widget.video.id.value, audioUrl);
+          }
+          await playerState.play(
             widget.video.title,
             widget.video.author,
             widget.video.thumbnails.maxResUrl,
@@ -59,6 +74,12 @@ class _SearchResultCardState extends State<SearchResultCard> {
           );
         } catch (e) {
           print('Error accessing PlayerState: $e');
+        } finally {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+          }
         }
       },
       child: _isLoading

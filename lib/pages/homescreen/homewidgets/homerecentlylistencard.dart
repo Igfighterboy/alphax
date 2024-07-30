@@ -3,6 +3,8 @@ import 'package:myapp/controller/recentcontroller/played_song_services.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:provider/provider.dart';
+import 'package:myapp/controller/playercontroller/playerstate.dart';
 
 class HomeRecentlyListenedCard extends StatefulWidget {
   final bool showArrow;
@@ -46,6 +48,17 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
     } else {
       return '${text.substring(0, limit)}..';
     }
+  }
+
+  void _playSong(Map<String, String> song) {
+    final playerState = Provider.of<PlayerState>(context, listen: false);
+    // Implement the play functionality here
+    playerState.play(
+      song['title']!,
+      song['artist']!,
+      song['thumbnailUrl']!,
+      song['audioUrl']!,
+    );
   }
 
   @override
@@ -99,10 +112,7 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
                     return Padding(
                       padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
                       child: GestureDetector(
-                        onTap: () {
-                          // Implement play functionality here
-                          // playerState.play(song['title']!, song['artist']!, song['thumbnailUrl']!, song['audioUrl']!);
-                        },
+                        onTap: () => _playSong(song),
                         child: Container(
                           width: 115,
                           decoration: BoxDecoration(

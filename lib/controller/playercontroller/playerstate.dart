@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/services/youtube_services.dart';
+import 'package:myapp/services/audio_cache_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -18,6 +19,7 @@ class PlayerState with ChangeNotifier {
   List<Map<String, String>> _playedSongs = [];
 
   final YoutubeService _youtubeService = YoutubeService();
+  final AudioCacheService _audioCacheService = AudioCacheService();
 
   PlayerState() {
     _audioPlayer.playerStateStream.listen((state) async {
@@ -74,6 +76,7 @@ class PlayerState with ChangeNotifier {
 
   Future<void> _fetchRelatedVideos(String title) async {
     _relatedVideos = await _youtubeService.fetchRelatedVideos(title);
+    await _audioCacheService.prefetchAudioStreams(_relatedVideos);
   }
 
   Future<void> _playNextRelatedSong() async {
@@ -86,12 +89,9 @@ class PlayerState with ChangeNotifier {
         final nextThumbnailUrl =
             nextVideo.thumbnails.maxResUrl; // Use max resolution URL
 
-        final audioStreamInfo =
-            await _youtubeService.getAudioStream(nextVideo.id.value);
-        if (audioStreamInfo != null) {
-          final nextAudioUrl = audioStreamInfo.url.toString();
-
-          await play(nextTitle, nextArtist, nextThumbnailUrl, nextAudioUrl);
+        final cachedAudioUrl = await _audioCacheService.getCachedAudioUrl(nextVideo.id.value);
+        if (cachedAudioUrl != null) {
+          await play(nextTitle, nextArtist, nextThumbnailUrl, cachedAudioUrl);
           return;
         }
       }

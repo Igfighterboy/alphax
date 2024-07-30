@@ -32,6 +32,7 @@ dependencies:
   flutter_local_notifications: ^14.0.0 #CURRENTLY NOT USING
   audio_service: ^0.18.15 #USED
   shimmer: ^3.0.0
+  redacted: ^1.0.12
 
 dev_dependencies:
   flutter_test:

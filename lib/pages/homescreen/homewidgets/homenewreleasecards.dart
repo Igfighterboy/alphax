@@ -7,7 +7,7 @@ import 'package:myapp/controller/playercontroller/playerstate.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:myapp/pages/homescreen/homewidgets/homesubpages/homesubnewrelease.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:shimmer/shimmer.dart';  // Import the shimmer package
 
 class HomeNewReleaseCard extends StatefulWidget {
   final bool showArrow;
@@ -100,6 +100,8 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Column(
       children: [
         Padding(
@@ -112,7 +114,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                 widget.homeIcon,
                 color: Theme.of(context).primaryColor,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 widget.homeTitle,
                 style: TextStyle(
@@ -142,7 +144,56 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
         LimitedBox(
           maxHeight: 150,
           child: isLoading
-              ? _buildShimmerList()
+              ? ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 5,  // Number of shimmer placeholders
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                          left: index == 0 ? 15 : 0, right: 15),
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          width: 115,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 105,
+                                width: 115,
+                                color: Colors.grey.shade300,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 80,
+                                      height: 12,
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    SizedBox(height: 5),
+                                    Container(
+                                      width: 60,
+                                      height: 12,
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _albumCache.albums.length,
@@ -210,61 +261,6 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                 ),
         ),
       ],
-    );
-  }
-
-  Widget _buildShimmerList() {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: 5, // Number of shimmer items
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              width: 115,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: 105,
-                    width: 115,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(3),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 15,
-                          width: 60,
-                          color: Colors.grey[300],
-                        ),
-                        SizedBox(height: 5),
-                        Container(
-                          height: 12,
-                          width: 40,
-                          color: Colors.grey[300],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
