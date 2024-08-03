@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/core/constatnts/size.dart';
 import 'package:http/http.dart' as http;
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:shimmer/shimmer.dart';
@@ -75,7 +74,7 @@ class _HomeCarouselWidgetState extends State<HomeCarouselWidget> {
           )
         else
           _buildShimmerPlaceholder(),
-        alphaheight20,
+        SizedBox(height: 20),
         AnimatedSmoothIndicator(
           activeIndex: _currentIndex,
           count: imgList.length,

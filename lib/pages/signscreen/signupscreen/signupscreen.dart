@@ -4,10 +4,15 @@ import 'package:get/get.dart';
 import 'package:myapp/core/constatnts/colors.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/pages/accountscreation/accountcreation.dart';
 import 'package:myapp/pages/mainscreen/mainscreen.dart';
+import 'package:myapp/pages/onboardingscreen/onboardingscreen.dart';
 import 'package:myapp/pages/signscreen/signinscreen/signinscreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:myapp/pages/signscreen/signupscreen/verifyemail.dart';
 import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -216,7 +221,11 @@ class SigninForm extends StatelessWidget {
                         color: Theme.of(context).primaryColor,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      // setState(() {
+                      //   _obscureText = !_obscureText;
+                      // });
+                    },
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide:
@@ -254,37 +263,69 @@ class SignButton extends StatelessWidget {
   final TextEditingController passwordController;
 
   Future<void> _signup(BuildContext context) async {
-    if (!formKey.currentState!.validate()) {
-      Get.snackbar('Error', 'Please fill in all fields',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
-      return;
-    }
-
     final username = usernameController.text;
     final email = emailController.text;
     final password = passwordController.text;
-    final token = 'tokenController.text';
-    const String url = 'http://172.232.0.1:3000/auth/signup'; // Your API URL
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token,
-      },
-      body: json.encode({
-        'username': username,
-        'email': email,
-        'password': password,
-      }),
-    );
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please fill out all fields',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
 
-    if (response.statusCode == 200) {
-      Get.snackbar('Success', 'Sign-up successful',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green);
-    } else {
-      Get.snackbar('Error', 'Sign-up failed',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+    Get.dialog(buildLoadingOverlay(), barrierDismissible: false);
+
+    const String url = 'http://172.232.124.96:5056/auth/signup';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'username': username,
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      // Close the loading dialog
+      Get.back();
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final String token = responseData['token'];
+        final user = responseData['user'];
+        final userJson = jsonEncode(user);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userToken', token);
+        await prefs.setString('user', userJson);
+        
+          Get.to(
+            () => const EmailVerificationScreen(),
+            transition: Transition.cupertino,
+            duration: const Duration(seconds: 1),
+          );
+      } else {
+        final responseData = json.decode(response.body);
+        Get.snackbar(
+          'Error',
+          responseData['message'],
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (error) {
+      print(error);
+      Get.back();
+      Get.snackbar(
+        'Error',
+        'An error occurred. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      );
     }
   }
 
@@ -409,7 +450,7 @@ class AlreadySign extends StatelessWidget {
       child: TextButton(
         onPressed: () {
           Get.to(
-            const SignInScreen(),
+            () => const SignInScreen(),
             transition: Transition.cupertino,
             duration: const Duration(seconds: 1),
           );
@@ -426,4 +467,10 @@ class AlreadySign extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget buildLoadingOverlay() {
+  return const Center(
+    child: CircularProgressIndicator(),
+  );
 }

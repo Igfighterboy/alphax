@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/controller/recentcontroller/played_song_services.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/core/widgets/popuswidgets/musicpopup/musicpopup.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
 import 'package:myapp/controller/playercontroller/playerstate.dart';
@@ -63,6 +64,37 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
 
   @override
   Widget build(BuildContext context) {
+    void _showMusicPopupDialog(
+        String currenttitle, String currentartist, String currentthumbnail) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return MusicPopup(
+            currenttitle: currenttitle,
+            currentartist: currentartist,
+            currentthumbnail: currentthumbnail,
+            onAddToLikedSongs: () {
+              print('clicked on Liked button');
+            },
+            onAddToPlaylist: () {
+              print('clicked on Playlist button');
+            },
+            onAddToQueue: () {
+              print('clicked on queue button');
+            },
+            onGoToAlbum: () {
+              print('clicked on Album button');
+            },
+            onShare: () {
+              print('clicked on Share button');
+            },
+            onGoToArtist: () {
+              print('clicked on Artist button');
+            },
+          );
+        },
+      );
+    }
     return Column(
       children: [
         Padding(
@@ -88,9 +120,7 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
               Spacer(),
               if (widget.showArrow)
                 GestureDetector(
-                  onTap: () {
-                    print('arrow clicked');
-                  },
+                  onTap: () {},
                   child: Icon(
                     Broken.arrow_right_3,
                     color: Theme.of(context).primaryColor,
@@ -109,10 +139,21 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
                   itemCount: _recentlyPlayedSongs.length,
                   itemBuilder: (context, index) {
                     final song = _recentlyPlayedSongs[index];
+                    if (song['thumbnailUrl'] == null || song['thumbnailUrl']!.isEmpty) {
+                      return SizedBox.shrink(); // Skip songs with no thumbnail
+                    }
                     return Padding(
-                      padding: EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
+                      padding:
+                          EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
                       child: GestureDetector(
                         onTap: () => _playSong(song),
+                        onLongPress: () {
+                          _showMusicPopupDialog(
+                            song['title']!,
+                            song['artist']!,
+                            song['thumbnailUrl']!,
+                          );
+                        },
                         child: Container(
                           width: 115,
                           decoration: BoxDecoration(
@@ -130,6 +171,17 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
                                   child: Image.network(
                                     song['thumbnailUrl']!,
                                     fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey.shade300,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.music_note,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
@@ -175,7 +227,7 @@ class _HomeRecentlyListenedCardState extends State<HomeRecentlyListenedCard> {
 
   Widget _buildShimmerPlaceholder() {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return LimitedBox(
       maxHeight: 150,
       child: ListView.builder(

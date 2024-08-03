@@ -1,38 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/controller/playercontroller/playerstate.dart';
 import 'package:myapp/core/constatnts/size.dart';
-import 'package:myapp/core/widgets/popuswidgets/musicpopup/musicpopup.dart';
 import 'package:myapp/pages/homescreen/homewidgets/homesubpages/homesubpagewidgets/homesubpagetitlecard.dart';
-import 'package:provider/provider.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-class HomesubNewrelease extends StatelessWidget {
-  final List<Map<String, String>> albums;
-
-  const HomesubNewrelease({
+class HomePopularalbumsSubPage extends StatelessWidget {
+  List<Map<String, dynamic>> popularAlbums = [];
+  HomePopularalbumsSubPage({
     super.key,
-    required this.albums,
+    required this.popularAlbums,
   });
-
-  void _playSong(BuildContext context, Map<String, String> album) async {
-    final playerState = Provider.of<PlayerState>(context, listen: false);
-    final youtubeExplode = YoutubeExplode();
-    try {
-      var video = await youtubeExplode.videos.get(album['videoUrl']!);
-      var manifest =
-          await youtubeExplode.videos.streamsClient.getManifest(video.id);
-      var audioStreamInfo = manifest.audioOnly.withHighestBitrate();
-      var audioUrl = audioStreamInfo.url.toString();
-
-      playerState.play(
-          album['title']!, album['artist']!, album['image']!, audioUrl);
-    } catch (e) {
-      print('Error playing song: $e');
-    } finally {
-      youtubeExplode.close();
-    }
-  }
 
   String _truncateText(String text, int limit) {
     if (text.length <= limit) {
@@ -44,55 +19,24 @@ class HomesubNewrelease extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void _showMusicPopupDialog(
-        String currenttitle, String currentartist, String currentthumbnail) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return MusicPopup(
-           currenttitle: currenttitle,
-            currentartist: currentartist,
-            currentthumbnail: currentthumbnail,
-            onAddToLikedSongs: () {
-              print('clicked on Liked button');
-            },
-            onAddToPlaylist: () {
-              print('clicked on Playlist button');
-            },
-            onAddToQueue: () {
-              print('clicked on queue button');
-            },
-            onGoToAlbum: () {
-              print('clicked on Album button');
-            },
-            onShare: () {
-              print('clicked on Share button');
-            },
-            onGoToArtist: () {
-              print('clicked on Artist button');
-            },
-          );
-        },
-      );
-    }
     final colorScheme = Theme.of(context).colorScheme;
-    final totalTracks = albums.length;
+    final totalAlbums = popularAlbums.length;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             HomeSubPageTitleCard(
-              subTitle: 'New Release',
-              totalTitle: 'Tracks',
-              totalTracks: totalTracks,
-            ),
+                totalTracks: totalAlbums,
+                subTitle: 'Popular Albums',
+                totalTitle: 'Albums'),
             alphaheight20,
             Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: albums.length,
+                itemCount: popularAlbums.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 12,
@@ -100,16 +44,18 @@ class HomesubNewrelease extends StatelessWidget {
                   childAspectRatio: 1.2 / 1.5,
                 ),
                 itemBuilder: (context, index) {
-                  final album = albums[index];
+                  final album = popularAlbums[index];
+                  final imageUrl =
+                      (album['images'] != null && album['images'].isNotEmpty)
+                          ? album['images'][0]['url']
+                          : 'https://via.placeholder.com/150';
+                  final albumName = album['name'] ?? 'Unknown';
+                  final artistName =
+                      (album['artists'] != null && album['artists'].isNotEmpty)
+                          ? album['artists'][0]['name']
+                          : 'Unknown';
                   return GestureDetector(
-                    onTap: () => _playSong(context, album),
-                    onLongPress: () {
-                        _showMusicPopupDialog(
-                          album['title']!,
-                          album['artist']!,
-                          album['image']!,
-                        );
-                      },
+                    onTap: () {},
                     child: Container(
                       decoration: BoxDecoration(
                         color: colorScheme.surface,
@@ -127,7 +73,7 @@ class HomesubNewrelease extends StatelessWidget {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(6),
                               child: Image.network(
-                                album['image']!,
+                                imageUrl,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -140,7 +86,7 @@ class HomesubNewrelease extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _truncateText(album['title']!, 12),
+                                  _truncateText(albumName, 12),
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
@@ -148,7 +94,7 @@ class HomesubNewrelease extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  _truncateText(album['artist']!, 12),
+                                  _truncateText(artistName, 10),
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w400,

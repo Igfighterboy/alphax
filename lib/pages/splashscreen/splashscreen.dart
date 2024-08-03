@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:myapp/controller/playercontroller/playerstate.dart';
 import 'package:myapp/controller/recentcontroller/played_song_services.dart';
 import 'package:myapp/core/constatnts/size.dart';
+import 'package:myapp/pages/mainscreen/mainscreen.dart';
 import 'package:myapp/pages/onboardingscreen/onboardingscreen.dart';
+import 'package:myapp/pages/signscreen/signinscreen/signinscreen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,14 +22,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _initializeApp();
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OnboardingScreen(),
-        ),
-      );
-    });
   }
 
   Future<void> _initializeApp() async {
@@ -33,6 +29,19 @@ class _SplashScreenState extends State<SplashScreen> {
     final playedSongs = await playedSongsService.loadPlayedSongs();
     final playerState = Provider.of<PlayerState>(context, listen: false);
     playerState.updatePlayedSongs(playedSongs);
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('userToken');
+    Future.delayed(const Duration(seconds: 3), () {
+      if (token != null) {
+        Get.offAll(() => MainScreen(),
+            transition: Transition.cupertino,
+            duration: const Duration(seconds: 1));
+      } else {
+        Get.offAll(() => const SignInScreen(),
+            transition: Transition.cupertino,
+            duration: const Duration(seconds: 1));
+      }
+    });
   }
 
   @override
@@ -115,9 +124,7 @@ class _SplashMainAreaState extends State<SplashMainArea>
           child: LinearProgressIndicator(
             value: controller.value,
             backgroundColor: Colors.transparent,
-            borderRadius: BorderRadius.circular(50),
-            valueColor: AlwaysStoppedAnimation<Color>(
-                colorScheme.primary), // Make the background transparent
+            valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
           ),
         ),
         const Spacer(

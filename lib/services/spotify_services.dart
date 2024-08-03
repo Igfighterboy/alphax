@@ -76,48 +76,53 @@ class SpotifyService {
   }
 
   Future<List<Map<String, dynamic>>> fetchPopularAlbums() async {
-    if (_accessToken == null) {
-      await _getAccessToken();
-    }
+  if (_accessToken == null) {
+    await _getAccessToken();
+  }
 
-    final randomLanguage = _getRandomLanguage();
+  final randomLanguage = _getRandomLanguage();
 
-    final response = await http.get(
-      Uri.parse(
-          'https://api.spotify.com/v1/browse/categories?locale=$randomLanguage'),
-      headers: {
-        'Authorization': 'Bearer $_accessToken',
-      },
-    );
+  final response = await http.get(
+    Uri.parse('https://api.spotify.com/v1/browse/categories?locale=$randomLanguage'),
+    headers: {
+      'Authorization': 'Bearer $_accessToken',
+    },
+  );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      List<Map<String, dynamic>> categories =
-          List<Map<String, dynamic>>.from(data['categories']['items']);
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    List<Map<String, dynamic>> categories =
+        List<Map<String, dynamic>>.from(data['categories']['items']);
 
-      List<Map<String, dynamic>> popularAlbums = [];
+    List<Map<String, dynamic>> popularAlbums = [];
 
-      for (var category in categories) {
-        final categoryId = category['id'];
-        final categoryResponse = await http.get(
-          Uri.parse(
-              'https://api.spotify.com/v1/browse/categories/$categoryId/playlists'),
-          headers: {
-            'Authorization': 'Bearer $_accessToken',
-          },
-        );
+    for (var category in categories) {
+      final categoryId = category['id'];
+      final categoryResponse = await http.get(
+        Uri.parse('https://api.spotify.com/v1/browse/categories/$categoryId/playlists'),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+        },
+      );
 
-        if (categoryResponse.statusCode == 200) {
-          final categoryData = jsonDecode(categoryResponse.body);
-          popularAlbums.addAll(List<Map<String, dynamic>>.from(
-              categoryData['playlists']['items']));
+      if (categoryResponse.statusCode == 200) {
+        final categoryData = jsonDecode(categoryResponse.body);
+        List<Map<String, dynamic>> playlists = 
+            List<Map<String, dynamic>>.from(categoryData['playlists']['items']);
+
+        for (var playlist in playlists) {
+          popularAlbums.add(playlist);
+          if (popularAlbums.length >= 10) {
+            return popularAlbums;
+          }
         }
       }
-      return popularAlbums;
-    } else {
-      throw Exception('Failed to load popular albums');
     }
+    return popularAlbums;
+  } else {
+    throw Exception('Failed to load popular albums');
   }
+}
 
 
    Future<List<Map<String, dynamic>>> search(String query, {String type = 'track'}) async {

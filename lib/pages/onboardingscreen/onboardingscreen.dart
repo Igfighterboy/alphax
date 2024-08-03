@@ -5,6 +5,8 @@ import 'package:get/route_manager.dart';
 import 'package:myapp/core/constatnts/colors.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/pages/accountscreation/accountcreation.dart';
+import 'package:myapp/pages/mainscreen/mainscreen.dart';
 import 'package:myapp/pages/onboardingscreen/onboardingwidget/onboardingitems.dart';
 import 'package:myapp/pages/signscreen/signinscreen/signinscreen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -33,7 +35,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      Get.to(() => SignInScreen(),
+      Get.to(() => AccountCreation(),
           transition: Transition.cupertino,
           duration: Duration(
             seconds: 1,

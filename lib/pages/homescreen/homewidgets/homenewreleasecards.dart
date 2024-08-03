@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/core/widgets/popuswidgets/musicpopup/musicpopup.dart';
 import 'package:myapp/services/youtube_services.dart';
 import 'package:myapp/controller/playercontroller/playerstate.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:myapp/pages/homescreen/homewidgets/homesubpages/homesubnewrelease.dart';
-import 'package:shimmer/shimmer.dart';  // Import the shimmer package
+import 'package:shimmer/shimmer.dart'; // Import the shimmer package
 
 class HomeNewReleaseCard extends StatefulWidget {
   final bool showArrow;
@@ -100,7 +100,42 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    void _showMusicPopupDialog(
+        String currenttitle, String currentartist, String currentthumbnail) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return MusicPopup(
+            currenttitle: currenttitle,
+            currentartist: currentartist,
+            currentthumbnail: currentthumbnail,
+            onAddToLikedSongs: () {
+              print('clicked on Liked button');
+            },
+            onAddToPlaylist: () {
+              print('clicked on Playlist button');
+            },
+            onAddToQueue: () {
+              print('clicked on queue button');
+            },
+            onGoToAlbum: () {
+              print('clicked on Album button');
+            },
+            onShare: () {
+              print('clicked on Share button');
+            },
+            onGoToArtist: () {
+              print('clicked on Artist button');
+            },
+          );
+        },
+      );
+    }
+
+    // Filter albums to exclude those without thumbnails
+    final List<Map<String, String>> albumsWithThumbnails = _albumCache.albums
+        .where((album) => album['image'] != null && album['image']!.isNotEmpty)
+        .toList();
 
     return Column(
       children: [
@@ -114,7 +149,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                 widget.homeIcon,
                 color: Theme.of(context).primaryColor,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 widget.homeTitle,
                 style: TextStyle(
@@ -124,12 +159,17 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                   fontFamily: 'LexendDeca',
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               if (widget.showArrow)
                 GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(CupertinoPageRoute(
-                        builder: (context) => HomesubNewrelease()));
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(
+                        builder: (context) => HomesubNewrelease(
+                          albums: albumsWithThumbnails,
+                        ),
+                      ),
+                    );
                   },
                   child: Icon(
                     Broken.arrow_right_3,
@@ -140,20 +180,22 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
           ),
         ),
         // SONG CARDS
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
+
         LimitedBox(
           maxHeight: 150,
           child: isLoading
               ? ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: 5,  // Number of shimmer placeholders
+                  itemCount: 5, // Number of shimmer placeholders
                   itemBuilder: (context, index) {
+                    final colorScheme = Theme.of(context).colorScheme;
                     return Padding(
-                      padding: EdgeInsets.only(
-                          left: index == 0 ? 15 : 0, right: 15),
+                      padding:
+                          EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
                       child: Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
+                        baseColor: colorScheme.secondary,
+                        highlightColor: colorScheme.surface,
                         child: Container(
                           width: 115,
                           decoration: BoxDecoration(
@@ -196,11 +238,18 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                 )
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: _albumCache.albums.length,
+                  itemCount: albumsWithThumbnails.length,
                   itemBuilder: (context, index) {
-                    final album = _albumCache.albums[index];
+                    final album = albumsWithThumbnails[index];
                     return GestureDetector(
                       onTap: () => _playSong(context, album),
+                      onLongPress: () {
+                        _showMusicPopupDialog(
+                          album['title']!,
+                          album['artist']!,
+                          album['image']!,
+                        );
+                      },
                       child: Padding(
                         padding: EdgeInsets.only(
                             left: index == 0 ? 15 : 0, right: 15),

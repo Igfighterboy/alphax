@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
@@ -6,9 +8,11 @@ import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 import 'package:myapp/core/themes/alphathemenotifier.dart';
 import 'package:myapp/pages/settingsscreen/settingsscreen.dart';
+import 'package:myapp/pages/signscreen/signinscreen/signinscreen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DrawerWidget extends StatelessWidget {
+class DrawerWidget extends StatefulWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final AdvancedDrawerController advanceddrawerController;
 
@@ -16,6 +20,30 @@ class DrawerWidget extends StatelessWidget {
     required this.navigatorKey,
     required this.advanceddrawerController,
   });
+
+  @override
+  _DrawerWidgetState createState() => _DrawerWidgetState();
+}
+
+class _DrawerWidgetState extends State<DrawerWidget> {
+  String _userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? userJson = prefs.getString('user');
+    if (userJson != null) {
+      final user = jsonDecode(userJson) as Map<String, dynamic>;
+      setState(() {
+        _userName = user['username'] ?? 'User';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +89,7 @@ class DrawerWidget extends StatelessWidget {
                       ),
                       alphawidth10,
                       Text(
-                        'UserName',
+                        _userName, // Use _userName here
                         style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
@@ -94,8 +122,8 @@ class DrawerWidget extends StatelessWidget {
             sideTitle: "What's New",
             sideIcon: Broken.information,
             sideButtonTap: () {
-              advanceddrawerController.hideDrawer();
-              // navigatorKey.currentState!.push(
+              widget.advanceddrawerController.hideDrawer();
+              // widget.navigatorKey.currentState!.push(
               //   CupertinoPageRoute(builder: (context) => PostButton()),
               // );
             },
@@ -105,8 +133,8 @@ class DrawerWidget extends StatelessWidget {
             sideTitle: 'Listening History',
             sideIcon: Broken.clock,
             sideButtonTap: () {
-              advanceddrawerController.hideDrawer();
-              // navigatorKey.currentState!.push(
+              widget.advanceddrawerController.hideDrawer();
+              // widget.navigatorKey.currentState!.push(
               //   CupertinoPageRoute(builder: (context) => PostButton()),
               // );
             },
@@ -116,12 +144,29 @@ class DrawerWidget extends StatelessWidget {
             sideTitle: "Settings",
             sideIcon: Broken.setting_2,
             sideButtonTap: () {
-              advanceddrawerController.hideDrawer();
-              navigatorKey.currentState!.push(
+              widget.advanceddrawerController.hideDrawer();
+              widget.navigatorKey.currentState!.push(
                 CupertinoPageRoute(
                   builder: (context) =>
-                      SettingsScreen(navigatorKey: navigatorKey),
+                      SettingsScreen(navigatorKey: widget.navigatorKey),
                 ),
+              );
+            },
+          ),
+          alphaheight10,
+          DrawerCardWidget(
+            sideTitle: "Logout",
+            sideIcon: Broken.setting_2,
+            sideButtonTap: () async {
+              widget.advanceddrawerController.hideDrawer();
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('user');
+              await prefs.remove('userToken');
+              widget.navigatorKey.currentState!.pushAndRemoveUntil(
+                CupertinoPageRoute(
+                  builder: (context) => const SignInScreen(),
+                ),
+                (route) => false,
               );
             },
           ),
@@ -140,11 +185,10 @@ class DrawerWidget extends StatelessWidget {
               ),
               alphaheight10,
               const ThemeTabs(
-                themeWidth: 61,
-                themeHeight: 35,
-                themecontainerWidth: 210,
-                themeLeft: 70.0
-              ),
+                  themeWidth: 61,
+                  themeHeight: 35,
+                  themecontainerWidth: 210,
+                  themeLeft: 70.0),
             ],
           ),
         ),
@@ -152,6 +196,7 @@ class DrawerWidget extends StatelessWidget {
     );
   }
 }
+
 
 class DrawerCardWidget extends StatelessWidget {
   final VoidCallback sideButtonTap;

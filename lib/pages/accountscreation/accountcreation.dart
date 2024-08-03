@@ -4,6 +4,7 @@ import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 import 'package:myapp/pages/accountscreation/accountwidget/accountartist.dart';
 import 'package:myapp/pages/accountscreation/accountwidget/accountlanguage.dart';
+import 'package:myapp/pages/mainscreen/mainscreen.dart';
 
 class AccountCreation extends StatefulWidget {
   @override
@@ -110,9 +111,10 @@ class _AccountCreationState extends State<AccountCreation> {
         step++;
       });
     } else if (step == 2 && selectedArtists.length >= minSelectableArtists) {
-      // Handle the final step
-      print('Selected Languages: $selectedLanguages');
-      print('Selected Artists: $selectedArtists');
+      Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MainScreen()),
+    );
     }
   }
 
