@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
 
-class HomeSubPageTitleCard extends StatelessWidget {
+class SubPageTitleCard extends StatelessWidget {
   final int totalTracks;
   final String subTitle;
   final String totalTitle;
-  const HomeSubPageTitleCard({
+  final bool showIcon;
+  final bool showText;
+  final String? imagePath;
+  final String? Ownertext;
+  const SubPageTitleCard({
     super.key,
     required this.totalTracks,
     required this.subTitle,
     required this.totalTitle,
+    required this.showIcon,
+    required this.showText,
+    this.imagePath,
+    this.Ownertext,
   });
 
   @override
@@ -33,11 +41,21 @@ class HomeSubPageTitleCard extends StatelessWidget {
               ),
             ),
             child: Center(
-              child: Icon(
-                Broken.music,
-                color: Theme.of(context).primaryColor,
-                size: 35,
-              ),
+              child: showIcon
+                  ? Icon(
+                      Broken.music,
+                      color: Theme.of(context).primaryColor,
+                      size: 35,
+                    )
+                  : imagePath != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            imagePath!,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : SizedBox.shrink(),
             ),
           ),
           alphawidth10,
@@ -53,6 +71,16 @@ class HomeSubPageTitleCard extends StatelessWidget {
                     color: Theme.of(context).primaryColor,
                     fontFamily: 'LexendDeca'),
               ),
+              showText
+                  ? Text(
+                      'Owner : $Ownertext',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).primaryColor,
+                          fontFamily: 'LexendDeca'),
+                    )
+                  : SizedBox.shrink(),
               Text(
                 '$totalTitle : $totalTracks',
                 style: TextStyle(

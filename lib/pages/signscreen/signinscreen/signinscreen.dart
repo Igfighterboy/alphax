@@ -41,7 +41,11 @@ class _SignInScreenState extends State<SignInScreen> {
             children: [
               TextButton(
                 onPressed: () {
-                  // Add navigation functionality if needed
+                 Get.to(
+            () => MainScreen(),
+            transition: Transition.cupertino,
+            duration: const Duration(seconds: 1),
+          );
                 },
                 child: Icon(
                   Broken.arrow_left_2,
@@ -146,7 +150,7 @@ class _SigninFormState extends State<SigninForm> {
     if (_formKey.currentState?.validate() ?? false) {
       final email = _emailController.text;
       final password = _passwordController.text;
-      const String url = 'http://172.232.124.96:5056/auth/signin';
+      const String url = 'http://172.232.124.96:5056/auth/login';
 
       try {
         final response = await http.post(

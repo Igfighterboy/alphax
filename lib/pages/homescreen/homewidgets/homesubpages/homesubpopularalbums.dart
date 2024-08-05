@@ -26,10 +26,13 @@ class HomePopularalbumsSubPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HomeSubPageTitleCard(
-                totalTracks: totalAlbums,
-                subTitle: 'Popular Albums',
-                totalTitle: 'Albums'),
+            SubPageTitleCard(
+              totalTracks: totalAlbums,
+              subTitle: 'Popular Albums',
+              totalTitle: 'Albums',
+              showIcon: true,
+              showText: false,
+            ),
             alphaheight20,
             Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),

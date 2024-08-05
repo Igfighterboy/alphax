@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const HomeBestArtistWidget(
               homeIcon: Broken.category_2,
               homeTitle: 'Best Of Artist',
-              showArrow: true,
+              showArrow: false,
             ),
             alphaheight30,
             const HomeArtistCardWidget(

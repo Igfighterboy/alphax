@@ -50,7 +50,7 @@ class HomesubNewrelease extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return MusicPopup(
-           currenttitle: currenttitle,
+            currenttitle: currenttitle,
             currentartist: currentartist,
             currentthumbnail: currentthumbnail,
             onAddToLikedSongs: () {
@@ -75,16 +75,19 @@ class HomesubNewrelease extends StatelessWidget {
         },
       );
     }
+
     final colorScheme = Theme.of(context).colorScheme;
     final totalTracks = albums.length;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            HomeSubPageTitleCard(
+            SubPageTitleCard(
               subTitle: 'New Release',
               totalTitle: 'Tracks',
               totalTracks: totalTracks,
+              showIcon: true,
+              showText: false,
             ),
             alphaheight20,
             Padding(
@@ -104,12 +107,12 @@ class HomesubNewrelease extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => _playSong(context, album),
                     onLongPress: () {
-                        _showMusicPopupDialog(
-                          album['title']!,
-                          album['artist']!,
-                          album['image']!,
-                        );
-                      },
+                      _showMusicPopupDialog(
+                        album['title']!,
+                        album['artist']!,
+                        album['image']!,
+                      );
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: colorScheme.surface,

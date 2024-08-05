@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/main.dart';
 import 'package:myapp/services/youtube_services.dart';
 import 'package:myapp/services/audio_cache_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:audio_service/audio_service.dart';
 
 class PlayerState with ChangeNotifier {
   String _title = '';
@@ -27,6 +29,17 @@ class PlayerState with ChangeNotifier {
         await _playNextRelatedSong();
       }
     });
+
+    // Listen to AudioService state changes
+    AudioService.playbackStateStream.listen((playbackState) {
+      if (playbackState.playing != _audioPlayer.playing) {
+        if (playbackState.playing) {
+          _audioPlayer.play();
+        } else {
+          _audioPlayer.pause();
+        }
+      }
+    });
   }
 
   String get title => _title;
@@ -43,6 +56,28 @@ class PlayerState with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
+    if (_audioPlayer.playing) {
+      await _audioPlayer.stop();
+    }
+
+    await AudioService.start(
+      backgroundTaskEntrypoint: audioPlayerTaskEntrypoint,
+      androidNotificationChannelName: 'Your Channel Name',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+      params: {
+        'mediaItem': MediaItem(
+          id: 'some_unique_id',
+          album: '',
+          title: title,
+          artist: artist,
+          duration: Duration.zero,
+          artUri: Uri.parse(thumbnailUrl),
+          extras: {'audioUrl': audioUrl},
+        ),
+      },
+    );
+
     await _audioPlayer.setUrl(audioUrl);
     _audioPlayer.play();
 
@@ -55,7 +90,6 @@ class PlayerState with ChangeNotifier {
     _isMiniPlayerVisible = true;
     notifyListeners();
 
-    // Save played song and fetch related videos
     await _savePlayedSong(title, artist, thumbnailUrl, audioUrl);
     await _fetchRelatedVideos(title);
   }
@@ -63,6 +97,7 @@ class PlayerState with ChangeNotifier {
   void pause() {
     _audioPlayer.pause().then((_) {
       notifyListeners();
+      AudioService.pause();
     });
   }
 
@@ -71,6 +106,7 @@ class PlayerState with ChangeNotifier {
       _isMiniPlayerVisible = false;
       _wasPlaying = false;
       notifyListeners();
+      AudioService.stop();
     });
   }
 
@@ -87,7 +123,7 @@ class PlayerState with ChangeNotifier {
         final nextTitle = nextVideo.title;
         final nextArtist = nextVideo.author;
         final nextThumbnailUrl =
-            nextVideo.thumbnails.maxResUrl; // Use max resolution URL
+            nextVideo.thumbnails.maxResUrl;
 
         final cachedAudioUrl = await _audioCacheService.getCachedAudioUrl(nextVideo.id.value);
         if (cachedAudioUrl != null) {
@@ -106,7 +142,7 @@ class PlayerState with ChangeNotifier {
 
   Future<void> _savePlayedSong(
     String title, String artist, String thumbnailUrl, String audioUrl) async {
-    final now = DateTime.now().toIso8601String(); // Add a timestamp for sorting
+    final now = DateTime.now().toIso8601String();
     final song = {
       'title': title,
       'artist': artist,

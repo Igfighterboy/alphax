@@ -1,7 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"/>
 
     <application
         android:label="ALPhA MUSIX"
@@ -10,7 +13,7 @@
 
         <!-- Existing MainActivity configuration -->
         <activity
-            android:name=".MainActivity"
+            android:name="com.ryanheise.audioservice.AudioServiceActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
@@ -26,6 +29,25 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+      <service 
+        android:name="com.ryanheise.audioservice.AudioService"
+        android:foregroundServiceType="mediaPlayback"
+        android:exported="true" 
+        tools:ignore="Instantiatable">
+    <intent-filter>
+        <action android:name="android.media.browse.MediaBrowserService" />
+    </intent-filter>
+    </service>  
+
+    <receiver 
+    android:name="com.ryanheise.audioservice.MediaButtonReceiver"
+    android:exported="true" 
+    tools:ignore="Instantiatable">
+  <intent-filter>
+    <action android:name="android.intent.action.MEDIA_BUTTON" />
+  </intent-filter>
+</receiver> 
 
         <!-- Add this block to declare the service -->
         <service

@@ -45,10 +45,10 @@ class MusicPopup extends StatelessWidget {
         child: Container(
           width: containerWidth,
           decoration: BoxDecoration(
-            color: colorScheme.surface.withOpacity(0.9),
+            color: colorScheme.secondary.withOpacity(0.9),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: colorScheme.surface,
+              color: colorScheme.secondary,
               width: 3,
             ),
           ),
@@ -170,9 +170,9 @@ class PopupMusicTitle extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _truncateText(currenttitle, 15),
+              _truncateText(currenttitle, 18),
               style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.w500,
                   color: Theme.of(context).primaryColor,
                   fontFamily: 'LexendDeca'),
@@ -180,7 +180,7 @@ class PopupMusicTitle extends StatelessWidget {
             Text(
               _truncateText(currentartist, 17),
               style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: Theme.of(context).primaryColor,
                   fontFamily: 'LexendDeca'),
@@ -205,7 +205,7 @@ class CustomDivider extends StatelessWidget {
       width: double.infinity,
       height: 1,
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
+        color: dividercolor,
         borderRadius: BorderRadius.circular(10),
       ),
     );
@@ -240,15 +240,15 @@ class ResuableButton extends StatelessWidget {
             Icon(
               icon,
               color: colorScheme.primary,
-              size: 28,
+              size: 23,
             ),
             alphawidth10,
             Text(
               label,
               style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   fontFamily: 'LexendDeca'),
             )
           ],
@@ -276,7 +276,7 @@ class PopUpPlayButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(5),
         child: Container(
-          height: 50,
+          height: 40,
           decoration: BoxDecoration(
             color: colorScheme.primary,
             borderRadius: BorderRadius.circular(10),
@@ -287,16 +287,16 @@ class PopUpPlayButton extends StatelessWidget {
               Text(
                 'Play',
                 style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     color: iconscolor,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                     fontFamily: 'LexendDeca'),
               ),
               alphawidth10,
               Icon(
                 Broken.play,
                 color: iconscolor,
-                size: 28,
+                size: 23,
               ),
             ],
           ),

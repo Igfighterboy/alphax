@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/controller/librarycontroller/librarycontroller.dart';
 import 'package:myapp/core/constatnts/size.dart';
 import 'package:myapp/core/icon_fonts/broken_icons.dart';
+import 'package:myapp/core/widgets/popuswidgets/playlistpopup/playlistmore.dart';
+import 'package:myapp/pages/libraryscreen/librarysubpages/playlistsubpage.dart';
 import 'package:myapp/pages/libraryscreen/librarywidgets/animatedserachbar.dart';
 import 'package:myapp/pages/libraryscreen/librarywidgets/libraryplaylistcards/libplaylistgrid.dart';
 import 'package:myapp/pages/libraryscreen/librarywidgets/libraryplaylistcards/libplaylistlist.dart';
@@ -61,56 +64,64 @@ class _LibraryScreenState extends State<LibraryScreen> {
     await PreferenceService.setViewType(_isGridViewNotifier.value);
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
+    void _showPlaylistMorePopupDialog() {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const PlaylistMorePopUp();
+          });
+    }
+
     return Scaffold(
       body: Stack(
         children: [
           CustomScrollView(slivers: [
             SliverAppBar(
-              title: Row(
+              title: Column(
                 children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const AnimatedSearch(),
-                        alphawidth10,
-                        GestureDetector(
-                          onTap: null,
-                          child: Icon(
-                            Broken.filter,
-                            size: 25,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const AnimatedSearch(),
+                            alphawidth10,
+                            GestureDetector(
+                              onTap: null,
+                              child: Icon(
+                                Broken.filter,
+                                size: 25,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => showCreatePlaylist(context),
-                    child: Icon(
-                      Broken.add,
-                      size: 35,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  alphawidth10,
-                  ValueListenableBuilder<bool>(
-                    valueListenable: _isGridViewNotifier,
-                    builder: (context, isGridView, child) {
-                      return GestureDetector(
-                        onTap: _toggleViewType,
+                      ),
+                      GestureDetector(
+                        onTap: () => showCreatePlaylist(context),
                         child: Icon(
-                          isGridView ? Broken.grid_2 : Broken.grid_1,
-                          size: 25,
+                          Broken.add,
+                          size: 35,
                           color: Theme.of(context).primaryColor,
                         ),
-                      );
-                    },
+                      ),
+                      alphawidth10,
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _isGridViewNotifier,
+                        builder: (context, isGridView, child) {
+                          return GestureDetector(
+                            onTap: _toggleViewType,
+                            child: Icon(
+                              isGridView ? Broken.grid_2 : Broken.grid_1,
+                              size: 25,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -152,8 +163,26 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         );
                       },
                       child: isGridView
-                          ? const LibraryplaylistGrid()
-                          : const LibraryplaylistList(),
+                          ? LibraryplaylistGrid(
+                              onMorePressed: _showPlaylistMorePopupDialog,
+                              onPlaylistTap: () {
+                                Navigator.of(context).push(
+                                  CupertinoPageRoute(
+                                      builder: (context) =>
+                                          const LibPlaylistSubPage()),
+                                );
+                              },
+                            )
+                          : LibraryplaylistList(
+                              onMoreTap: _showPlaylistMorePopupDialog,
+                              onPlaylistTap: () {
+                                Navigator.of(context).push(
+                                  CupertinoPageRoute(
+                                      builder: (context) =>
+                                          const LibPlaylistSubPage()),
+                                );
+                              },
+                            ),
                     );
                   },
                 ),

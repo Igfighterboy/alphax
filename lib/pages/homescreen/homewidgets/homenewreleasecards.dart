@@ -194,12 +194,12 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                       padding:
                           EdgeInsets.only(left: index == 0 ? 15 : 0, right: 15),
                       child: Shimmer.fromColors(
-                        baseColor: colorScheme.secondary,
-                        highlightColor: colorScheme.surface,
+                        baseColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
                         child: Container(
                           width: 115,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
+                            color: Colors.blue,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Column(
@@ -208,7 +208,7 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                               Container(
                                 height: 105,
                                 width: 115,
-                                color: Colors.grey.shade300,
+                                color: Colors.green,
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(3),
@@ -218,13 +218,13 @@ class _HomeNewReleaseCardState extends State<HomeNewReleaseCard> {
                                     Container(
                                       width: 80,
                                       height: 12,
-                                      color: Colors.grey.shade300,
+                                      color: Colors.orange,
                                     ),
                                     SizedBox(height: 5),
                                     Container(
                                       width: 60,
                                       height: 12,
-                                      color: Colors.grey.shade300,
+                                      color: Colors.purple,
                                     ),
                                   ],
                                 ),

@@ -1,4 +1,6 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/controller/playercontroller/audio_play_task.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:myapp/core/themes/alphathemenotifier.dart';
@@ -10,7 +12,6 @@ import 'package:myapp/services/audio_cache_service.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  
   runApp(
     MultiProvider(
       providers: [
@@ -21,6 +22,10 @@ void main() {
       child: MyApp(),
     ),
   );
+}
+
+void audioPlayerTaskEntrypoint() {
+  AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
 class MyApp extends StatelessWidget {

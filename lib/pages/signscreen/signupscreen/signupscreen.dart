@@ -104,7 +104,7 @@ class SigninTitle extends StatelessWidget {
   }
 }
 
-class SigninForm extends StatelessWidget {
+class SigninForm extends StatefulWidget {
   const SigninForm({
     super.key,
     required this.formKey,
@@ -119,17 +119,24 @@ class SigninForm extends StatelessWidget {
   final TextEditingController passwordController;
 
   @override
+  State<SigninForm> createState() => _SigninFormState();
+}
+
+class _SigninFormState extends State<SigninForm> {
+  bool _obscureText = true;
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: Form(
-        key: formKey,
+        key: widget.formKey,
         child: Column(
           children: [
             SizedBox(
               width: 350,
               height: 50,
               child: TextFormField(
-                controller: usernameController,
+                controller: widget.usernameController,
                 style: TextStyle(color: Theme.of(context).primaryColor),
                 decoration: InputDecoration(
                   labelText: 'Username',
@@ -162,7 +169,7 @@ class SigninForm extends StatelessWidget {
               width: 350,
               height: 50,
               child: TextFormField(
-                controller: emailController,
+                controller: widget.emailController,
                 style: TextStyle(color: Theme.of(context).primaryColor),
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -195,7 +202,7 @@ class SigninForm extends StatelessWidget {
               width: 350,
               height: 50,
               child: TextFormField(
-                controller: passwordController,
+                controller: widget.passwordController,
                 style: TextStyle(color: Theme.of(context).primaryColor),
                 obscureText: true,
                 decoration: InputDecoration(
@@ -216,15 +223,15 @@ class SigninForm extends StatelessWidget {
                         );
                       },
                       child: Icon(
-                        true ? Broken.eye_slash : Broken.eye,
-                        key: const ValueKey<bool>(true),
+                        _obscureText ? Broken.eye_slash : Broken.eye,
+                        key: ValueKey<bool>(_obscureText),
                         color: Theme.of(context).primaryColor,
                       ),
                     ),
                     onPressed: () {
-                      // setState(() {
-                      //   _obscureText = !_obscureText;
-                      // });
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
                     },
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -302,12 +309,12 @@ class SignButton extends StatelessWidget {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('userToken', token);
         await prefs.setString('user', userJson);
-        
-          Get.to(
-            () => const EmailVerificationScreen(),
-            transition: Transition.cupertino,
-            duration: const Duration(seconds: 1),
-          );
+
+        Get.to(
+          () => const EmailVerificationScreen(),
+          transition: Transition.cupertino,
+          duration: const Duration(seconds: 1),
+        );
       } else {
         final responseData = json.decode(response.body);
         Get.snackbar(
